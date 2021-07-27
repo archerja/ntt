@@ -9,10 +9,7 @@ import random
 version = '0.0.1'
 
 mp3s = []
-#mediapath = "/home/archerja/Music/music/Have A Nice Decade/"
-#mediapath = "/home/archerja/Music/music/"
-mediapath = "/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/"
-#mediapath = "/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979/"
+mediapath = "/home/archerja/Music/"
 
 # number of seconds
 end = 5
