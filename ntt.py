@@ -6,17 +6,20 @@ import os
 import sys
 import random
 
-version = '0.0.2'
+version = '0.0.3'
 
+# create empty array
 mp3s = []
-mediapath1 = "/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979/"
-mediapath2 = "/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/"
-mediapath3 = "/media/archerja/My Passport/backup/Music/Compilation/Magic 80s/"
-mediapath4 = "/media/archerja/My Passport/backup/Music/Compilation/Columbia Country Classics/"
-mediapath5 = "/media/archerja/My Passport/backup/Music/Compilation/160 One Hit Wonders/"
 
 # number of seconds
 end = 5
+
+# set your music paths
+mediapath1 = '/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979/'
+mediapath2 = '/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/'
+mediapath3 = '/media/archerja/My Passport/backup/Music/Compilation/Magic 80s/'
+mediapath4 = '/media/archerja/My Passport/backup/Music/Compilation/Columbia Country Classics/'
+mediapath5 = '/media/archerja/My Passport/backup/Music/Compilation/160 One Hit Wonders/'
 
 # create list of songs
 def makelist(listnum,listpath):
@@ -24,36 +27,91 @@ def makelist(listnum,listpath):
             for name in files:
                 if name[-4:].lower() == '.mp3':
                     path = os.path.join(root,name)
-                    location = path.split(path)[1]
+                    #location = path.split(path)[1]
                     mp3s.append([listnum,path])
-        print("Music from: " + listpath)
-        print("Loaded " + str(len(mp3s)) + " total songs...")
-        print(" ")
-        random.shuffle(mp3s)
+        print('(' + str(len(mp3s)) + ')' + listpath)
+        #print(listpath.split('/')[-2])
+        #print('Loading music from: ' + listpath)
+        #print(str(len(mp3s)) + ' total songs...')
+        #print(' ')
         return mp3s
 
+# get mp3 tags with mpv
 def songinfo(song,info):
         return os.system('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info))
 
+# clear the screen with os call
+def clearscreen():
+        # Linux
+        os.system('clear')
+        # Windows
+        # os.system('cls')
+
 # start the game
 def gamebanner():
-        print(" ")
-        print("Get ready to play...")
-        print(" ")
-        print("****************************")
-        print("    Joe's Name That Tune    ")  
-        print("          v." + version)
-        print("****************************")
-        print(" ")
-        input("Press enter to begin...")
+        clearscreen()
+        print(' ')
+        print("::::::'##::'#######::'########:'####::'######:::::'##::: ##::::'###::::'##::::'##:'########:")
+        print(":::::: ##:'##.... ##: ##.....:: ####:'##... ##:::: ###:: ##:::'## ##::: ###::'###: ##.....::")
+        print(":::::: ##: ##:::: ##: ##:::::::. ##:: ##:::..::::: ####: ##::'##:. ##:: ####'####: ##:::::::")
+        print(":::::: ##: ##:::: ##: ######:::'##:::. ######::::: ## ## ##:'##:::. ##: ## ### ##: ######:::")
+        print("'##::: ##: ##:::: ##: ##...::::..:::::..... ##:::: ##. ####: #########: ##. #: ##: ##...::::")
+        print(" ##::: ##: ##:::: ##: ##:::::::::::::'##::: ##:::: ##:. ###: ##.... ##: ##:.:: ##: ##:::::::")
+        print(". ######::. #######:: ########:::::::. ######::::: ##::. ##: ##:::: ##: ##:::: ##: ########:")
+        print(":......::::.......:::........:::::::::......::::::..::::..::..:::::..::..:::::..::........::")
+        print(":::'########:'##::::'##::::'###::::'########::::'########:'##::::'##:'##::: ##:'########::::")
+        print(":::... ##..:: ##:::: ##:::'## ##:::... ##..:::::... ##..:: ##:::: ##: ###:: ##: ##.....:::::")
+        print(":::::: ##:::: ##:::: ##::'##:. ##::::: ##:::::::::: ##:::: ##:::: ##: ####: ##: ##::::::::::")
+        print(":::::: ##:::: #########:'##:::. ##:::: ##:::::::::: ##:::: ##:::: ##: ## ## ##: ######::::::")
+        print(":::::: ##:::: ##.... ##: #########:::: ##:::::::::: ##:::: ##:::: ##: ##. ####: ##...:::::::")
+        print(":::::: ##:::: ##:::: ##: ##.... ##:::: ##:::::::::: ##:::: ##:::: ##: ##:. ###: ##::::::::::")
+        print(":::::: ##:::: ##:::: ##: ##:::: ##:::: ##:::::::::: ##::::. #######:: ##::. ##: ########::::")
+        print("::::::..:::::..:::::..::..:::::..:::::..:::::::::::..::::::.......:::..::::..::........:::::")
+        print('                                           v.' + version)
+        print(' ')
+        input('                                                                 Press enter to begin...')
+        print(' ')
 
 # end the game
 def exitbanner():
-        print(" ")
-        print("**************************")
-        print("*  Thanks for playing    *")
-        print("**************************")
-        print(" ")
+        clearscreen()
+        print(' ')
+        print('****************************')
+        print('*    Thanks for playing    *')
+        print('****************************')
+        print(' ')
+
+def help():
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+        print(' ')
+
+def loadgame():
+        clearscreen()
+        print('Loading music from: ')
+        print(' ')
+        makelist(1,mediapath1)
+        makelist(2,mediapath2)
+        makelist(3,mediapath3)
+        makelist(4,mediapath4)
+        makelist(5,mediapath5)
+        if len(mp3s) == 0:
+            print('????? No songs loaded in game...')
+            print('????? Check folder locations...')
+            exitbanner()
+            sys.exit(0)
+        print(' ')
+        print('shuffling ' + str(len(mp3s)) + ' total songs...')
+        random.shuffle(mp3s)
+        input('...press enter to begin the game!')
 
 # let's begin
 def main(mp3s):
@@ -63,30 +121,35 @@ def main(mp3s):
                 if picklist == 0:
                     status = True
                     while status:
-                        print("-------------------------------------")
-                        print("Select which audio list")
-                        print("(a) " + mediapath1)
-                        print("(b) " + mediapath2)
-                        print("(c) " + mediapath3)
-                        print("(d) " + mediapath4)
-                        print("(e) " + mediapath5)
-                        response = input("Pick a, b, c, d, e, or (q)uit, then press enter: ")
-                        if "q" in response:
+                        clearscreen()
+                        print('-------------------------------------')
+                        print('Select which song list:')
+                        print('  (a) ' + mediapath1.split('/')[-2])
+                        print('  (b) ' + mediapath2.split('/')[-2])
+                        print('  (c) ' + mediapath3.split('/')[-2])
+                        print('  (d) ' + mediapath4.split('/')[-2])
+                        print('  (e) ' + mediapath5.split('/')[-2])
+                        print('Pick a, b, c, d, e, (h)elp, or (q)uit')
+                        response = input('[a/b/c/d/e/h/q] enter: ')
+                        if 'q' in response:
                             exitbanner()
                             sys.exit(0)
-                        elif "a" in response:
+                        elif 'h' in response:
+                            help()
+                            continue
+                        elif 'a' in response:
                             picklist = 1
                             status = False
-                        elif "b" in response:
+                        elif 'b' in response:
                             picklist = 2
                             status = False
-                        elif "c" in response:
+                        elif 'c' in response:
                             picklist = 3
                             status = False
-                        elif "d" in response:
+                        elif 'd' in response:
                             picklist = 4
                             status = False
-                        elif "e" in response:
+                        elif 'e' in response:
                             picklist = 5
                             status = False
                         else:
@@ -95,26 +158,31 @@ def main(mp3s):
                     picklist = 0
                 else:
                     continue
-                print("----------")
-                print("Press space to hear the song...")
+                print('----------')
+                print('Press space to hear the song...')
                 os.system('mpv --really-quiet --pause --start=0 --end=' + str(end + 1) + ' "' +  mp3s[j][1] + '"')
+                print('----------')
                 status = True
                 while status:
-                    response = input("Get (a)nswer, (c)heat add 10 seconds, hear (w)hole song, (n)ext song, or (q)uit [a/c/w/n/q] enter: ")
-                    print("----------")
-                    if "q" in response:
+                    print('(a)nswer, (c)heat, (w)hole song, (n)ext song, (h)elp, or (q)uit')
+                    response = input('[a/c/w/n/h/q] then enter: ')
+                    print('----------')
+                    if 'q' in response:
                         exitbanner()
                         sys.exit(0)
-                    elif "a" in response:
+                    elif 'h' in response:
+                        help()
+                        continue
+                    elif 'a' in response:
                         #print(mp3s[j][1])
-                        songinfo(mp3s[j][1],'artist')
                         songinfo(mp3s[j][1],'title')
-                        print("----------")
-                    elif "w" in response:
+                        songinfo(mp3s[j][1],'artist')
+                        print('----------')
+                    elif 'w' in response:
                         os.system('mpv "' +  mp3s[j][1] + '"')
-                    elif "c" in response:
+                    elif 'c' in response:
                         os.system('mpv --really-quiet --start=0 --end=' + str(end + 11) + ' "' +  mp3s[j][1] + '"')
-                    elif "n" in response:
+                    elif 'n' in response:
                         status = False
                     else:
                         continue
@@ -122,10 +190,6 @@ def main(mp3s):
 if __name__ == '__main__':
 
         gamebanner()
-        makelist(1,mediapath1)
-        makelist(2,mediapath2)
-        makelist(3,mediapath3)
-        makelist(4,mediapath4)
-        makelist(5,mediapath5)
+        loadgame()
         main(mp3s)
 
