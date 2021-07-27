@@ -6,10 +6,14 @@ import os
 import sys
 import random
 
-version = '0.0.1'
+version = '0.0.2'
 
 mp3s = []
-mediapath = "/home/archerja/Music/"
+mediapath1 = "/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979/"
+mediapath2 = "/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/"
+mediapath3 = "/media/archerja/My Passport/backup/Music/Compilation/Magic 80s/"
+mediapath4 = "/media/archerja/My Passport/backup/Music/Compilation/Columbia Country Classics/"
+mediapath5 = "/media/archerja/My Passport/backup/Music/Compilation/160 One Hit Wonders/"
 
 # number of seconds
 end = 5
