@@ -1,0 +1,20 @@
+#
+# this is a comment, game does not read comments
+# up to 9 directory paths can be listed below
+# put a # at the beginning of the line to disable path
+# only the first 9 uncommented paths will be used
+# remember to put a slash at the end of the path
+# menu items will be listed by the order below
+#
+
+/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979
+/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/
+/media/archerja/My Passport/backup/Music/Compilation/Flower Power/
+/media/archerja/My Passport/backup/Music/Compilation/Columbia Country Classics/
+/media/archerja/My Passport/backup/Music/Compilation/101 One Hit Wonders/
+/media/archerja/My Passport/backup/Music/Compilation/Disco Fever/
+#/media/archerja/My Passport/backup/Music/Classical/The Top 100 Masterpieces/
+/media/archerja/My Passport/backup/Music/Classical/Great Music Classics/
+/media/archerja/My Passport/backup/Music/Classical/Forever Classics/
+/media/archerja/My Passport/backup/Music/Classical/Andres Segovia/
+
