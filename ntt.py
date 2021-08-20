@@ -7,7 +7,7 @@ import sys
 import random
 import re
 
-version = '0.0.7'
+version = '0.0.8'
 
 # --------------------
 # configuration start
@@ -158,12 +158,14 @@ def help():
     print('Help:   (spacebar) - when ready, press spacebar to hear the song')
     print('Help: ')
     print('Help: After hearing the song:')
-    print('Help:   (a)nswer   - reveal the artist and title of a song')
-    print('Help:   (c)heat    - hear the first '+ str(clipsec + cheatsec) + ' seconds of a song')
-    print('Help:   (w)hole    - hear the whole song (reveals song info)')
-    print('Help:   (n)ext     - go to next song selection')
+    print('Help:   (a) answer   - reveal the artist and title of a song')
+    print('Help:   (r) replay   - hear the first '+ str(clipsec) + ' seconds of a song')
+    print('Help:   (c) cheat    - hear the first '+ str(clipsec + cheatsec) + ' seconds of a song')
+    print('Help:   (w) whole    - hear the whole song (artist and title are hidden)')
+    print('Help:   (p) play     - hear the whole song (reveals song info)')
+    print('Help:   (n) next     - go to next song selection')
     print('Help: ')
-    print('Help:   (q)uit     - quit game')
+    print('Help:   (q) quit     - quit game')
     print(' ')
     input('Press enter to exit help')
     clearscreen()
@@ -308,13 +310,15 @@ def main(songs):
             print('Select one of the following:')
             print('----------')
             print('( a ) answer')
-            print('( c ) cheat')
-            print('( w ) whole song')
+            print('( r ) replay     [first ' + str(clipsec) + ' seconds]')
+            print('( c ) cheat      [first ' + str(clipsec + cheatsec) + ' seconds]')
+            print('( w ) whole song [press q to stop]')
+            print('( p ) play song  [artist/title revealed]')
             print('( n ) next song')
             print('( ? ) help')
             print('( q ) quit')
             print('----------')
-            print("Pick ['a','c','w','n','?','q']")
+            print("Pick ['a','r','c','w','p','n','?','q']")
             response = input('then press enter: ')
             if 'q' in response:
                 exitbanner()
@@ -333,11 +337,15 @@ def main(songs):
                 print(answer_artist)
                 print(' ')
                 print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-            elif 'w' in response:
-                #os.system('mpv "' +  songs[j][2] + '"')
-                os.system('mpv --display-tags=* "' +  songs[j][2] + '"')
+            elif 'r' in response:
+                os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
             elif 'c' in response:
                 os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + cheatsec + 1) + ' "' +  songs[j][2] + '"')
+            elif 'w' in response:
+                os.system('mpv --really-quiet --start=0 ' + '"' +  songs[j][2] + '"')
+            elif 'p' in response:
+                os.system('mpv "' +  songs[j][2] + '"')
+                #os.system('mpv --display-tags=* "' +  songs[j][2] + '"')
             elif 'n' in response:
                 status2 = False
             else:
@@ -348,4 +356,5 @@ if __name__ == '__main__':
     gamebanner()
     loadgame()
     main(songs)
+
 
