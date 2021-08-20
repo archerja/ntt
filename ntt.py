@@ -7,7 +7,7 @@ import sys
 import random
 import re
 
-version = '0.0.6'
+version = '0.0.7'
 
 # --------------------
 # configuration start
@@ -90,8 +90,12 @@ def songinfo(song,info):
     """
     get mp3 tag using mpv and grep
     """
-    return os.system('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info))
-    #return map(os.system('mpv "%s" --display-tags=%s --no-audio --no-video > /dev/null 2>&1' % (song, info)),(l for l in sys.stdin if re.search(info,l)))
+    #return os.system('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info))
+    songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info)).read()
+    #songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no' % song).read()
+    #songdata = re.findall(info,songdata)
+    return songdata
+
 
 def clearscreen():
     """
@@ -295,6 +299,9 @@ def main(songs):
         print('----------')
         print('Press spacebar to hear the song...')
         os.system('mpv --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
+        # load answer
+        answer_title = songinfo(songs[j][2],'title')
+        answer_artist = songinfo(songs[j][2],'artist')
         status2 = True
         while status2:
             print('-------------------------------------')
@@ -319,8 +326,11 @@ def main(songs):
                 print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
                 print(' ')
                 print(' menu:', menu['menu'+ str(songs[j][0])]['song_group'])
-                songinfo(songs[j][2],'title')
-                songinfo(songs[j][2],'artist')
+                print(' ')
+                #songinfo(songs[j][2],'title')
+                #songinfo(songs[j][2],'artist')
+                print(answer_title)
+                print(answer_artist)
                 print(' ')
                 print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
             elif 'w' in response:
@@ -338,5 +348,4 @@ if __name__ == '__main__':
     gamebanner()
     loadgame()
     main(songs)
-
 
