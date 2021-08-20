@@ -3,31 +3,45 @@
 
 This python3 script will create a list of local songs to use in a simple "Name That Tune" game.
 
-It is set at a 5 second audio clip. It can be changed in the script itself.
-
-You have multiple options after the clip plays.
-
 ```
-::::::'##::'#######::'########:'####::'######:::::'##::: ##::::'###::::'##::::'##:'########:
-:::::: ##:'##.... ##: ##.....:: ####:'##... ##:::: ###:: ##:::'## ##::: ###::'###: ##.....::
-:::::: ##: ##:::: ##: ##:::::::. ##:: ##:::..::::: ####: ##::'##:. ##:: ####'####: ##:::::::
-:::::: ##: ##:::: ##: ######:::'##:::. ######::::: ## ## ##:'##:::. ##: ## ### ##: ######:::
-:##::: ##: ##:::: ##: ##...::::..:::::..... ##:::: ##. ####: #########: ##. #: ##: ##...::::
-:##::: ##: ##:::: ##: ##:::::::::::::'##::: ##:::: ##:. ###: ##.... ##: ##:.:: ##: ##:::::::
-: ######::. #######:: ########:::::::. ######::::: ##::. ##: ##:::: ##: ##:::: ##: ########:
-:......::::.......:::........:::::::::......::::::..::::..::..:::::..::..:::::..::........::
-:::'########:'##::::'##::::'###::::'########::::'########:'##::::'##:'##::: ##:'########::::
-:::... ##..:: ##:::: ##:::'## ##:::... ##..:::::... ##..:: ##:::: ##: ###:: ##: ##.....:::::
-:::::: ##:::: ##:::: ##::'##:. ##::::: ##:::::::::: ##:::: ##:::: ##: ####: ##: ##::::::::::
-:::::: ##:::: #########:'##:::. ##:::: ##:::::::::: ##:::: ##:::: ##: ## ## ##: ######::::::
-:::::: ##:::: ##.... ##: #########:::: ##:::::::::: ##:::: ##:::: ##: ##. ####: ##...:::::::
-:::::: ##:::: ##:::: ##: ##.... ##:::: ##:::::::::: ##:::: ##:::: ##: ##:. ###: ##::::::::::
-:::::: ##:::: ##:::: ##: ##:::: ##:::: ##:::::::::: ##::::. #######:: ##::. ##: ########::::
-::::::..:::::..:::::..::..:::::..:::::..:::::::::::..::::::.......:::..::::..::........:::::
-                                           v.0.0.6
- 
-                                                                 Press enter to begin...
+:'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::
+: ###:: ##:::'## ##::: ###::'###: ##.....::::::::::::::::::::::
+: ####: ##::'##:. ##:: ####'####: ##:::::::::::::::::::::::::::
+: ## ## ##:'##:::. ##: ## ### ##: ######:::::::::::::::::::::::
+: ##. ####: #########: ##. #: ##: ##...::::::::::::::::::::::::
+: ##:. ###: ##.... ##: ##:.:: ##: ##:::::::::::::::::::::::::::
+: ##::. ##: ##:::: ##: ##:::: ##: ########:::::::::::::::::::::
+:..::::..::..:::::..::..:::::..::........::::::::::::::::::::::
+:::::::::'########:'##::::'##::::'###::::'########:::::::::::::
+:::::::::... ##..:: ##:::: ##:::'## ##:::... ##..::::::::::::::
+:::::::::::: ##:::: ##:::: ##::'##:. ##::::: ##::::::::::::::::
+:::::::::::: ##:::: #########:'##:::. ##:::: ##::::::::::::::::
+:::::::::::: ##:::: ##.... ##: #########:::: ##::::::::::::::::
+:::::::::::: ##:::: ##:::: ##: ##.... ##:::: ##::::::::::::::::
+:::::::::::: ##:::: ##:::: ##: ##:::: ##:::: ##::::::::::::::::
+::::::::::::..:::::..:::::..::..:::::..:::::..:::::::::::::::::
+::::::::::::::::::::'########:'##::::'##:'##::: ##:'########:::
+::::::::::::::::::::... ##..:: ##:::: ##: ###:: ##: ##.....::::
+::::::::::::::::::::::: ##:::: ##:::: ##: ####: ##: ##:::::::::
+::::::::::::::::::::::: ##:::: ##:::: ##: ## ## ##: ######:::::
+::::::::::::::::::::::: ##:::: ##:::: ##: ##. ####: ##...::::::
+::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::
+::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::
+:::::::::::::::::::::::..::::::.......:::..::::..::........::::
+    v.0.0.9
+                                  Press enter to begin...
 ```
+
+## Some of the options
+
+* Reads a file with up to 9 different music folders listed.
+* Scans each folder, and it becomes a seperate menu option.
+* It is set at a 5 second audio clip, from the beginning of the song.
+* It also allows for 10 extra seconds to be added.
+* Can play the whole song, with or without revealing the artist and title.
+* Play a random song.
+
+> Note: These settings can be changed in the script itself.
 
 ## Background
 
@@ -35,10 +49,14 @@ MPV has a neat feature that allows you to hear a song, without showing anything 
 
 ## Installation
 
-This script requires:
+***This script requires:***
 
  -  [mpv](https://mpv.io) to play the songs, hide the artist/title, and read mp3 tags.
- -  [grep](https://www.gnu.org/software/grep) to search within mpv mp3 tags.
+
+### Configuration
+
+* Place ntt.py and songs in a folder.
+* Edit the song file, (default filename is "songs"), and enter the full path to your music folders containing your songs.
 
 
 ## Usage example
@@ -53,6 +71,60 @@ $ ./ntt.py
 $ python3 ntt.py
 ```
 
+
+#### Song selection menu
+```
+==================================================
+Select one of the following: 
+--------------------
+( a ) Folder of Rock (160 songs)
+( b ) Folder of Country (86 songs)
+( c ) 50s Instrumental Hits (60 songs)
+( d ) Classical Music (80 songs)
+( r ) Random song
+( ? ) help
+( q ) quit game
+--------------------
+Pick  ['q', 'r', '?', 'a', 'b', 'c', 'd']
+then press enter: d
+--------------------
+Press spacebar to hear the song...
+```
+
+#### Menu after audio clip is played
+
+```
+==================================================
+Select one of the following:
+--------------------
+( a ) answer     [artist/title revealed]
+( r ) replay     [first 5 seconds]
+( c ) cheat      [first 15 seconds]
+( w ) whole song [press q to stop]
+( p ) play song  [artist/title revealed]
+( n ) next song
+( ? ) help
+( q ) quit
+--------------------
+Pick ['a','r','c','w','p','n','?','q']
+then press enter:  
+```
+
+#### Selection 'a' is picked
+```
+==================================================
+ 
+ menu: Classical Music
+ 
+ title: Piano Sonata No. 8 in C minor, Op. 13
+
+ artist: Ludwig van Beethoven
+
+ 
+==================================================
+...press enter to continue
+```
+
 #### help within the game
 
 ``` 
@@ -64,18 +136,29 @@ Help: To hear the first 5 seconds of a song:
 Help:   (spacebar) - when ready, press spacebar to hear the song
 Help: 
 Help: After hearing the song:
-Help:   (a)nswer   - reveal the artist and title of a song
-Help:   (c)heat    - hear the first 15 seconds of a song
-Help:   (w)hole    - hear the whole song (reveals song info)
-Help:   (n)ext     - go to next song selection
+Help:   (a) answer   - reveal the artist and title of a song
+Help:   (r) replay   - hear the first 5 seconds of a song
+Help:   (c) cheat    - hear the first 15 seconds of a song
+Help:   (w) whole    - hear the whole song (artist/title are hidden)
+Help:   (p) play     - hear the whole song (reveals song info)
+Help:   (n) next     - go to next song group selection
 Help: 
-Help:   (q)uit     - quit game
+Help:   (q) quit     - quit game
  
 Press enter to exit help
 ```
 
 ## Release History
 
+*  0.0.9
+    * code cleanup
+    * removed grep command dependency
+*  0.0.8
+    * added: replay 5 sec clip
+    * added: play whole song (artist/title hidden)
+    * added: play whole song (reveal artist/title)
+*  0.0.7
+    *  Preload answer for quicker response
 *  0.0.6
     *  Code/logic cleanup
     *  Random song
@@ -101,3 +184,4 @@ Joseph Archer (C) 2021
 ## License
 
 The code is covered by the MIT.
+

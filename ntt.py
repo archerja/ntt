@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-# requires mpv, and grep
+# requires mpv
 
 import os
 import sys
 import random
-import re
 
-version = '0.0.8'
+version = '0.0.9'
 
 # --------------------
 # configuration start
@@ -18,7 +17,6 @@ song_ext = '.mp3'
 # number of seconds to play
 clipsec = 5
 cheatsec = 10
-totalsec = clipsec + cheatsec
 
 # name your file of directories below
 songfile = 'songs'
@@ -90,12 +88,10 @@ def songinfo(song,info):
     """
     get mp3 tag using mpv and grep
     """
-    #return os.system('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info))
-    songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no | grep %s ' % (song, info)).read()
-    #songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no' % song).read()
-    #songdata = re.findall(info,songdata)
-    return songdata
-
+    songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no' % song).readlines()
+    for line in songdata:
+        if info in line:
+          return line
 
 def clearscreen():
     """
@@ -108,32 +104,46 @@ def clearscreen():
         # Windows
         os.system('cls')
 
+def menubar(size):
+    if size == 'l':
+        print('==================================================')
+    elif size == 's':
+        print('--------------------')
+    else:
+        print('$$$$$$$$$$$$$$$$$$$$$$$$')
+
 def gamebanner():
     """
     create the game banner
-    with a nod to old arcade/console games
     """
     clearscreen()
     print(' ')
-    print("::::::'##::'#######::'########:'####::'######:::::'##::: ##::::'###::::'##::::'##:'########:")
-    print(":::::: ##:'##.... ##: ##.....:: ####:'##... ##:::: ###:: ##:::'## ##::: ###::'###: ##.....::")
-    print(":::::: ##: ##:::: ##: ##:::::::. ##:: ##:::..::::: ####: ##::'##:. ##:: ####'####: ##:::::::")
-    print(":::::: ##: ##:::: ##: ######:::'##:::. ######::::: ## ## ##:'##:::. ##: ## ### ##: ######:::")
-    print(":##::: ##: ##:::: ##: ##...::::..:::::..... ##:::: ##. ####: #########: ##. #: ##: ##...::::")
-    print(":##::: ##: ##:::: ##: ##:::::::::::::'##::: ##:::: ##:. ###: ##.... ##: ##:.:: ##: ##:::::::")
-    print(": ######::. #######:: ########:::::::. ######::::: ##::. ##: ##:::: ##: ##:::: ##: ########:")
-    print(":......::::.......:::........:::::::::......::::::..::::..::..:::::..::..:::::..::........::")
-    print(":::'########:'##::::'##::::'###::::'########::::'########:'##::::'##:'##::: ##:'########::::")
-    print(":::... ##..:: ##:::: ##:::'## ##:::... ##..:::::... ##..:: ##:::: ##: ###:: ##: ##.....:::::")
-    print(":::::: ##:::: ##:::: ##::'##:. ##::::: ##:::::::::: ##:::: ##:::: ##: ####: ##: ##::::::::::")
-    print(":::::: ##:::: #########:'##:::. ##:::: ##:::::::::: ##:::: ##:::: ##: ## ## ##: ######::::::")
-    print(":::::: ##:::: ##.... ##: #########:::: ##:::::::::: ##:::: ##:::: ##: ##. ####: ##...:::::::")
-    print(":::::: ##:::: ##:::: ##: ##.... ##:::: ##:::::::::: ##:::: ##:::: ##: ##:. ###: ##::::::::::")
-    print(":::::: ##:::: ##:::: ##: ##:::: ##:::: ##:::::::::: ##::::. #######:: ##::. ##: ########::::")
-    print("::::::..:::::..:::::..::..:::::..:::::..:::::::::::..::::::.......:::..::::..::........:::::")
-    print('                                           v.' + version)
-    print(' ')
-    input('                                                                 Press enter to begin...')
+    print(":'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::")
+    print(": ###:: ##:::'## ##::: ###::'###: ##.....::::::::::::::::::::::")
+    print(": ####: ##::'##:. ##:: ####'####: ##:::::::::::::::::::::::::::")
+    print(": ## ## ##:'##:::. ##: ## ### ##: ######:::::::::::::::::::::::")
+    print(": ##. ####: #########: ##. #: ##: ##...::::::::::::::::::::::::")
+    print(": ##:. ###: ##.... ##: ##:.:: ##: ##:::::::::::::::::::::::::::")
+    print(": ##::. ##: ##:::: ##: ##:::: ##: ########:::::::::::::::::::::")
+    print(":..::::..::..:::::..::..:::::..::........::::::::::::::::::::::")
+    print(":::::::::'########:'##::::'##::::'###::::'########:::::::::::::")
+    print(":::::::::... ##..:: ##:::: ##:::'## ##:::... ##..::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##::'##:. ##::::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: #########:'##:::. ##:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##.... ##: #########:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##: ##.... ##:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##: ##:::: ##:::: ##::::::::::::::::")
+    print("::::::::::::..:::::..:::::..::..:::::..:::::..:::::::::::::::::")
+    print("::::::::::::::::::::'########:'##::::'##:'##::: ##:'########:::")
+    print("::::::::::::::::::::... ##..:: ##:::: ##: ###:: ##: ##.....::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ####: ##: ##:::::::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ## ## ##: ######:::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##. ####: ##...::::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::")
+    print("::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::")
+    print(":::::::::::::::::::::::..::::::.......:::..::::..::........::::")
+    print('    v.' + version)
+    input('                                  Press enter to begin...')
     print(' ')
 
 def exitbanner():
@@ -161,9 +171,9 @@ def help():
     print('Help:   (a) answer   - reveal the artist and title of a song')
     print('Help:   (r) replay   - hear the first '+ str(clipsec) + ' seconds of a song')
     print('Help:   (c) cheat    - hear the first '+ str(clipsec + cheatsec) + ' seconds of a song')
-    print('Help:   (w) whole    - hear the whole song (artist and title are hidden)')
+    print('Help:   (w) whole    - hear the whole song (artist/title are hidden)')
     print('Help:   (p) play     - hear the whole song (reveals song info)')
-    print('Help:   (n) next     - go to next song selection')
+    print('Help:   (n) next     - go to next song group selection')
     print('Help: ')
     print('Help:   (q) quit     - quit game')
     print(' ')
@@ -174,10 +184,12 @@ def loadmenu():
     """
     create the selection menu
     """
+    clearscreen()
+    menubar('l')
     global menu_opts
     menu_opts = ['q','r','?']
     print('Select one of the following: ')
-    print('----------')
+    menubar('s')
     if menu.get('menu1'):
         if menu['menu1']['song_total'] > 0:
             print('( a )', menu['menu1']['song_group'], '(' + str(menu['menu1']['song_total']) + ' songs)')
@@ -217,7 +229,7 @@ def loadmenu():
     print('( r ) Random song')
     print('( ? ) help')
     print('( q ) quit game')
-    print('----------')
+    menubar('s')
 
 def loadgame():
     """
@@ -237,19 +249,19 @@ def loadgame():
     random.shuffle(songs)
     random.shuffle(songs)
     print(' ')
-    input('...press enter to begin the game!')
+    #input('...press enter to begin the game!')
 
-def main(songs):
+def main():
     """
     let's have some fun
     """
-    clearscreen()
+    gamebanner()
+    loadgame()
     picklist = 0
     for j in range(0,len(songs)-1):
         if picklist == 0:
             status = True
             while status:
-                print('-------------------------------------')
                 loadmenu()
                 print('Pick ', menu_opts)
                 response = input('then press enter: ')
@@ -298,7 +310,7 @@ def main(songs):
             picklist = 0
         else:
             continue
-        print('----------')
+        menubar('s')
         print('Press spacebar to hear the song...')
         os.system('mpv --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
         # load answer
@@ -306,10 +318,11 @@ def main(songs):
         answer_artist = songinfo(songs[j][2],'artist')
         status2 = True
         while status2:
-            print('-------------------------------------')
+            clearscreen()
+            menubar('l')
             print('Select one of the following:')
-            print('----------')
-            print('( a ) answer')
+            menubar('s')
+            print('( a ) answer     [artist/title revealed]')
             print('( r ) replay     [first ' + str(clipsec) + ' seconds]')
             print('( c ) cheat      [first ' + str(clipsec + cheatsec) + ' seconds]')
             print('( w ) whole song [press q to stop]')
@@ -317,7 +330,7 @@ def main(songs):
             print('( n ) next song')
             print('( ? ) help')
             print('( q ) quit')
-            print('----------')
+            menubar('s')
             print("Pick ['a','r','c','w','p','n','?','q']")
             response = input('then press enter: ')
             if 'q' in response:
@@ -327,16 +340,16 @@ def main(songs):
                 help()
                 continue
             elif 'a' in response:
-                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                clearscreen()
+                menubar('l')
                 print(' ')
                 print(' menu:', menu['menu'+ str(songs[j][0])]['song_group'])
                 print(' ')
-                #songinfo(songs[j][2],'title')
-                #songinfo(songs[j][2],'artist')
                 print(answer_title)
                 print(answer_artist)
                 print(' ')
-                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                menubar('l')
+                input('...press enter to continue')
             elif 'r' in response:
                 os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
             elif 'c' in response:
@@ -345,7 +358,6 @@ def main(songs):
                 os.system('mpv --really-quiet --start=0 ' + '"' +  songs[j][2] + '"')
             elif 'p' in response:
                 os.system('mpv "' +  songs[j][2] + '"')
-                #os.system('mpv --display-tags=* "' +  songs[j][2] + '"')
             elif 'n' in response:
                 status2 = False
             else:
@@ -353,8 +365,6 @@ def main(songs):
 
 if __name__ == '__main__':
 
-    gamebanner()
-    loadgame()
-    main(songs)
+    main()
 
 
