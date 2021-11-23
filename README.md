@@ -1,7 +1,7 @@
 
 # ntt.py - NAME THAT TUNE
 
-This python3 script will create a list of local songs to use in a simple "Name That Tune" game.
+This python3 script will create a menu from a list of local songs to use in a simple "Name That Tune" game.
 
 ```
 :'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::
@@ -28,18 +28,19 @@ This python3 script will create a list of local songs to use in a simple "Name T
 ::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::
 ::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::
 :::::::::::::::::::::::..::::::.......:::..::::..::........::::
-    v.0.0.9
+    v.0.1.1
                                   Press enter to begin...
 ```
 
 ## Some of the options
 
 * Reads a file with up to 9 different music folders listed.
-* Scans each folder, and it becomes a seperate menu option.
+* Scans each folder, and it's name becomes a separate menu option.
 * It is set at a 5 second audio clip, from the beginning of the song.
 * It also allows for 10 extra seconds to be added.
 * Can play the whole song, with or without revealing the artist and title.
 * Play a random song.
+* Override mode, for continuous, random play.
 
 > Note: These settings can be changed in the script itself.
 
@@ -55,7 +56,7 @@ MPV has a neat feature that allows you to hear a song, without showing anything 
 
 ### Configuration
 
-* Place ntt.py and songs in a folder.
+* Place ntt.py and music directory file (songs) in a folder.
 * Edit the song file, (default filename is "songs"), and enter the full path to your music folders containing your songs.
 
 
@@ -71,28 +72,27 @@ $ ./ntt.py
 $ python3 ntt.py
 ```
 
-
 #### Song selection menu
 ```
 ==================================================
-Select one of the following: 
+Select one of the 386 following songs: 
 --------------------
 ( a ) Folder of Rock (160 songs)
 ( b ) Folder of Country (86 songs)
 ( c ) 50s Instrumental Hits (60 songs)
 ( d ) Classical Music (80 songs)
 ( r ) Random song
+( o ) Override mode
 ( ? ) help
 ( q ) quit game
 --------------------
-Pick  ['q', 'r', '?', 'a', 'b', 'c', 'd']
+Pick  ['a', 'b', 'c', 'd','r','o','?','q']
 then press enter: d
 --------------------
 Press spacebar to hear the song...
 ```
 
 #### Menu after audio clip is played
-
 ```
 ==================================================
 Select one of the following:
@@ -125,12 +125,42 @@ then press enter:
 ...press enter to continue
 ```
 
+#### Override mode
+```
+==================================================
+ 
+ catalog: 101 One Hit Wonders
+ 
+ listen to the whole song,
+ or [space] to pause,
+ or [left](rewind) / [right](forward),
+ or [q]uit song, for answer
+ 
+==================================================
+```
+
+##### Override: after "q" is pressed
+```
+==================================================
+ 
+ catalog: 101 One Hit Wonders
+ 
+ title: Baker Street
+
+ artist: Gerry Rafferty
+
+==================================================
+ 
+ press enter for next song, or q to quit: 
+```
+
 #### help within the game
 
 ``` 
 Help: To select a song to hear:
 Help:   (a - i)    - pick a song group
 Help:   (r)        - pick a random song
+Help:   (o)        - override mode (continuous play)
 Help: 
 Help: To hear the first 5 seconds of a song:
 Help:   (spacebar) - when ready, press spacebar to hear the song
@@ -150,6 +180,8 @@ Press enter to exit help
 
 ## Release History
 
+*  0.1.1
+    * Added override menu option for continuous, random play
 *  0.0.9
     * code cleanup
     * removed grep command dependency

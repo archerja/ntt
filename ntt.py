@@ -6,7 +6,7 @@ import os
 import sys
 import random
 
-version = '0.0.9'
+version = '0.1.1'
 
 # --------------------
 # configuration start
@@ -86,7 +86,7 @@ def pickcount(songs,pick):
 
 def songinfo(song,info):
     """
-    get mp3 tag using mpv and grep
+    get mp3 tag using mpv
     """
     songdata = os.popen ('mpv "%s" --display-tags=album,artist,title --audio=no --video=no' % song).readlines()
     for line in songdata:
@@ -103,14 +103,6 @@ def clearscreen():
     else:
         # Windows
         os.system('cls')
-
-def menubar(size):
-    if size == 'l':
-        print('==================================================')
-    elif size == 's':
-        print('--------------------')
-    else:
-        print('$$$$$$$$$$$$$$$$$$$$$$$$')
 
 def gamebanner():
     """
@@ -152,9 +144,9 @@ def exitbanner():
     """
     clearscreen()
     print(' ')
-    print('****************************')
-    print('*    Thanks for playing    *')
-    print('****************************')
+    print('-' * 20)
+    print(' Thanks for playing ')
+    print('-' * 20)
     print(' ')
 
 def help():
@@ -163,6 +155,7 @@ def help():
     print('Help: To select a song to hear:')
     print('Help:   (a - i)    - pick a song group')
     print('Help:   (r)        - pick a random song')
+    print('Help:   (o)        - override mode (continuous play)')
     print('Help: ')
     print('Help: To hear the first ' + str(clipsec) + ' seconds of a song:')
     print('Help:   (spacebar) - when ready, press spacebar to hear the song')
@@ -185,11 +178,11 @@ def loadmenu():
     create the selection menu
     """
     clearscreen()
-    menubar('l')
+    print('=' * 50)
     global menu_opts
-    menu_opts = ['q','r','?']
-    print('Select one of the following: ')
-    menubar('s')
+    menu_opts = []
+    print('Select one of the ' + str(len(songs)) + ' following songs: ')
+    print('-' * 20)
     if menu.get('menu1'):
         if menu['menu1']['song_total'] > 0:
             print('( a )', menu['menu1']['song_group'], '(' + str(menu['menu1']['song_total']) + ' songs)')
@@ -226,10 +219,15 @@ def loadmenu():
         if menu['menu9']['song_total'] > 0:
             print('( i )', menu['menu9']['song_group'], '(' + str(menu['menu9']['song_total']) + ' songs)')
             menu_opts.append('i')
+    menu_opts.append('r')
+    menu_opts.append('o')
+    menu_opts.append('?')
+    menu_opts.append('q')
     print('( r ) Random song')
+    print('( o ) Override mode')
     print('( ? ) help')
     print('( q ) quit game')
-    menubar('s')
+    print('-' * 20)
 
 def loadgame():
     """
@@ -237,6 +235,7 @@ def loadgame():
     """
     global songs
     songs = []
+    gamebanner()
     clearscreen()
     getlocations()
     if len(songs) == 0:
@@ -248,14 +247,47 @@ def loadgame():
     random.shuffle(songs)
     random.shuffle(songs)
     random.shuffle(songs)
-    print(' ')
-    #input('...press enter to begin the game!')
+
+def override():
+    for k in songs:
+        if k[0] in range(1,9):
+             catalog = ' catalog: ' +  k[2].split('/')[-1].split(' - ')[0]
+             clearscreen()
+             print('=' * 50)
+             print(' ')
+             print(catalog)
+             print(' ')
+             print(' listen to the whole song,')
+             print(' or [space] to pause,')
+             print(' or [left](rewind) / [right](forward),')
+             print(' or [q]uit song, for answer')
+             print(' ')
+             print('=' * 50)
+             os.system('mpv --really-quiet --start=0 ' + '"' +  k[2] + '"')
+             answer_title = songinfo(k[2],'title:')
+             answer_artist = songinfo(k[2],'artist:')
+             clearscreen()
+             print('=' * 50)
+             print(' ')
+             print(catalog)
+             print(' ')
+             print(answer_title)
+             print(answer_artist)
+             print('=' * 50)
+             print(' ')
+             response = input(' press enter for next song, or q to quit: ')
+             if 'q' in response:
+                 exitbanner()
+                 sys.exit(0)
+             else:
+                 continue
+    exitbanner()
+    sys.exit(0)
 
 def main():
     """
     let's have some fun
     """
-    gamebanner()
     loadgame()
     picklist = 0
     for j in range(0,len(songs)-1):
@@ -263,7 +295,8 @@ def main():
             status = True
             while status:
                 loadmenu()
-                print('Pick ', menu_opts)
+                print('Pick an option: ')
+                print(menu_opts)
                 response = input('then press enter: ')
                 if response in menu_opts:
                     if 'q' in response:
@@ -304,24 +337,27 @@ def main():
                         while pickcount(songs,picklist) == 0:
                             picklist = random.randint(1,9)
                         status = False
+                    elif 'o' in response:
+                        override()
+                        status = False
                     else:
                         continue
         if songs[j][0] == picklist:
             picklist = 0
         else:
             continue
-        menubar('s')
+        print('-' * 20)
         print('Press spacebar to hear the song...')
         os.system('mpv --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
         # load answer
-        answer_title = songinfo(songs[j][2],'title')
-        answer_artist = songinfo(songs[j][2],'artist')
+        answer_title = songinfo(songs[j][2],'title:')
+        answer_artist = songinfo(songs[j][2],'artist:')
         status2 = True
         while status2:
             clearscreen()
-            menubar('l')
+            print('=' * 50)
             print('Select one of the following:')
-            menubar('s')
+            print('-' * 20)
             print('( a ) answer     [artist/title revealed]')
             print('( r ) replay     [first ' + str(clipsec) + ' seconds]')
             print('( c ) cheat      [first ' + str(clipsec + cheatsec) + ' seconds]')
@@ -330,7 +366,7 @@ def main():
             print('( n ) next song')
             print('( ? ) help')
             print('( q ) quit')
-            menubar('s')
+            print('-' * 20)
             print("Pick ['a','r','c','w','p','n','?','q']")
             response = input('then press enter: ')
             if 'q' in response:
@@ -341,14 +377,14 @@ def main():
                 continue
             elif 'a' in response:
                 clearscreen()
-                menubar('l')
+                print('=' * 50)
                 print(' ')
                 print(' menu:', menu['menu'+ str(songs[j][0])]['song_group'])
                 print(' ')
                 print(answer_title)
                 print(answer_artist)
                 print(' ')
-                menubar('l')
+                print('=' * 50)
                 input('...press enter to continue')
             elif 'r' in response:
                 os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
@@ -366,5 +402,4 @@ def main():
 if __name__ == '__main__':
 
     main()
-
 
