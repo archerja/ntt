@@ -6,7 +6,7 @@ import os
 import sys
 import random
 
-version = '0.1.1'
+version = '0.1.3'
 
 # --------------------
 # configuration start
@@ -20,6 +20,13 @@ cheatsec = 10
 
 # name your file of directories below
 songfile = 'songs'
+
+# team information
+teamshow = False
+team1name = 'Gals'
+team1score = 0
+team2name = 'Guys'
+team2score = 0
 
 # configuration end
 # --------------------
@@ -145,9 +152,16 @@ def exitbanner():
     clearscreen()
     print(' ')
     print('-' * 20)
-    print(' Thanks for playing ')
-    print('-' * 20)
     print(' ')
+    response = input('Are you sure you want to quit? (Y/y) ')
+    if 'Y' in response.upper():
+        clearscreen()
+        print(' ')
+        print('-' * 20)
+        print(' Thanks for playing ')
+        print('-' * 20)
+        print(' ')
+        sys.exit(0)
 
 def help():
     clearscreen()
@@ -156,6 +170,7 @@ def help():
     print('Help:   (a - i)    - pick a song group')
     print('Help:   (r)        - pick a random song')
     print('Help:   (o)        - override mode (continuous play)')
+    print('Help:   (t)        - team menu (hide/show/rename/score)')
     print('Help: ')
     print('Help: To hear the first ' + str(clipsec) + ' seconds of a song:')
     print('Help:   (spacebar) - when ready, press spacebar to hear the song')
@@ -178,7 +193,8 @@ def loadmenu():
     create the selection menu
     """
     clearscreen()
-    print('=' * 50)
+    teamscores()
+    print('=' * 60)
     global menu_opts
     menu_opts = []
     print('Select one of the ' + str(len(songs)) + ' following songs: ')
@@ -221,12 +237,12 @@ def loadmenu():
             menu_opts.append('i')
     menu_opts.append('r')
     menu_opts.append('o')
+    menu_opts.append('t')
     menu_opts.append('?')
     menu_opts.append('q')
-    print('( r ) Random song')
-    print('( o ) Override mode')
-    print('( ? ) help')
-    print('( q ) quit game')
+    print('-' * 10)
+    print('( r ) Random song    ( o ) Override mode    ( t ) Team menu')
+    print('( ? ) help           ( q ) quit game')
     print('-' * 20)
 
 def loadgame():
@@ -248,41 +264,105 @@ def loadgame():
     random.shuffle(songs)
     random.shuffle(songs)
 
+def teamscores():
+    """
+    display team names and scores
+    """
+    global teamshow
+    if teamshow:
+        print('=' * 60)
+        #print(' ')
+        print(team1name.center(25) + ' vs '.center(10) + team2name.center(25))
+        print(str(team1score).center(25) + ' '.center(10) + str(team2score).center(25))
+        #print(' ')
+
+def teammenu():
+    global teamshow
+    global team1name
+    global team2name
+    global team1score
+    global team2score
+    status3 = True
+    while status3:
+        clearscreen()
+        teamscores()
+        print('=' * 60)
+        print('Select one of the following:')
+        print('-' * 20)
+        print('( 1 ) change score for ' + team1name)
+        print('( 2 ) change score for ' + team2name)
+        print(' ')
+        print('( 3 ) change team name for ' + team1name)
+        print('( 4 ) change team name for ' + team2name)
+        print('( 5 ) show teams on menus ')
+        print(' ')
+        print('( q ) quit menu, back to game')
+        print('-' * 20)
+        print("Pick ['1','2','3','4','5','q']")
+        response = input('then press enter: ')
+        if 'q' in response:
+            status3 = False
+        elif '?' in response:
+            help()
+            continue
+        elif '1' in response:
+            newscore = input('enter new score: ')
+            team1score = newscore
+            continue
+        elif '2' in response:
+            newscore = input('enter new score: ')
+            team2score = newscore
+            continue
+        elif '3' in response:
+            newname = input('enter new name: ')
+            team1name = newname
+            continue
+        elif '4' in response:
+            newname = input('enter new name: ')
+            team2name = newname
+            continue
+        elif '5' in response:
+            if teamshow:
+                teamshow = False
+            else:
+                teamshow = True
+            continue
+        else:
+            continue
+
 def override():
     for k in songs:
         if k[0] in range(1,9):
              catalog = ' catalog: ' +  k[2].split('/')[-1].split(' - ')[0]
              clearscreen()
-             print('=' * 50)
+             print('=' * 60)
              print(' ')
              print(catalog)
              print(' ')
              print(' listen to the whole song,')
              print(' or [space] to pause,')
              print(' or [left](rewind) / [right](forward),')
-             print(' or [q]uit song, for answer')
+             print(' or [q]uit playing the song, reveal the answer')
              print(' ')
-             print('=' * 50)
+             print('=' * 60)
              os.system('mpv --really-quiet --start=0 ' + '"' +  k[2] + '"')
              answer_title = songinfo(k[2],'title:')
              answer_artist = songinfo(k[2],'artist:')
              clearscreen()
-             print('=' * 50)
+             print('=' * 60)
              print(' ')
              print(catalog)
              print(' ')
              print(answer_title)
              print(answer_artist)
-             print('=' * 50)
+             print('=' * 60)
              print(' ')
-             response = input(' press enter for next song, or q to quit: ')
+             response = input(' press enter for the next song, or q to quit: ')
              if 'q' in response:
                  exitbanner()
-                 sys.exit(0)
              else:
                  continue
     exitbanner()
-    sys.exit(0)
 
 def main():
     """
@@ -301,7 +381,6 @@ def main():
                 if response in menu_opts:
                     if 'q' in response:
                         exitbanner()
-                        sys.exit(0)
                     elif '?' in response:
                         help()
                         continue
@@ -340,6 +419,9 @@ def main():
                     elif 'o' in response:
                         override()
                         status = False
+                    elif 't' in response:
+                        teammenu()
+                        continue
                     else:
                         continue
         if songs[j][0] == picklist:
@@ -355,36 +437,40 @@ def main():
         status2 = True
         while status2:
             clearscreen()
-            print('=' * 50)
+            teamscores()
+            print('=' * 60)
             print('Select one of the following:')
             print('-' * 20)
-            print('( a ) answer     [artist/title revealed]')
-            print('( r ) replay     [first ' + str(clipsec) + ' seconds]')
-            print('( c ) cheat      [first ' + str(clipsec + cheatsec) + ' seconds]')
-            print('( w ) whole song [press q to stop]')
-            print('( p ) play song  [artist/title revealed]')
-            print('( n ) next song')
+            print('( a ) answer          [artist/title revealed]')
+            print('( r ) replay          [first ' + str(clipsec) + ' seconds]')
+            print('( c ) cheat           [first ' + str(clipsec + cheatsec) + ' seconds]')
+            print('( w ) whole song      [press q to stop]')
+            print('( p ) play song       [artist/title revealed]')
+            print('( n ) next song       [return to group selection menu]')
+            print('( t ) team menu       [hide/show/rename/score]')
             print('( ? ) help')
             print('( q ) quit')
             print('-' * 20)
-            print("Pick ['a','r','c','w','p','n','?','q']")
+            print("Pick ['a','r','c','w','p','n','t','?','q']")
             response = input('then press enter: ')
             if 'q' in response:
                 exitbanner()
-                sys.exit(0)
             elif '?' in response:
                 help()
                 continue
+            elif 't' in response:
+                teammenu()
+                continue
             elif 'a' in response:
                 clearscreen()
-                print('=' * 50)
+                print('=' * 60)
                 print(' ')
                 print(' menu:', menu['menu'+ str(songs[j][0])]['song_group'])
                 print(' ')
                 print(answer_title)
                 print(answer_artist)
                 print(' ')
-                print('=' * 50)
+                print('=' * 60)
                 input('...press enter to continue')
             elif 'r' in response:
                 os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')

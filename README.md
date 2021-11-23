@@ -3,6 +3,8 @@
 
 This python3 script will create a menu from a list of local songs to use in a simple "Name That Tune" game.
 
+It works really well with compilation albums (various artists). I use it with a Raspberry Pi connected to my TV. I use a 128 GB SD card, without GUI, and a display resolution of 640x480 60Hz 4:3 (CEA Mode 1).
+
 ```
 :'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::
 : ###:: ##:::'## ##::: ###::'###: ##.....::::::::::::::::::::::
@@ -28,7 +30,7 @@ This python3 script will create a menu from a list of local songs to use in a si
 ::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::
 ::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::
 :::::::::::::::::::::::..::::::.......:::..::::..::........::::
-    v.0.1.1
+    v.0.1.3
                                   Press enter to begin...
 ```
 
@@ -41,8 +43,9 @@ This python3 script will create a menu from a list of local songs to use in a si
 * Can play the whole song, with or without revealing the artist and title.
 * Play a random song.
 * Override mode, for continuous, random play.
+* Two team hide/show (with team naming and scoring).
 
-> Note: These settings can be changed in the script itself.
+> Note: Settings can be changed in the script itself.
 
 ## Background
 
@@ -74,45 +77,67 @@ $ python3 ntt.py
 
 #### Song selection menu
 ```
-==================================================
+============================================================
 Select one of the 386 following songs: 
 --------------------
 ( a ) Folder of Rock (160 songs)
 ( b ) Folder of Country (86 songs)
 ( c ) 50s Instrumental Hits (60 songs)
 ( d ) Classical Music (80 songs)
-( r ) Random song
-( o ) Override mode
-( ? ) help
-( q ) quit game
+----------
+( r ) Random song    ( o ) Override mode    ( t ) Team menu
+( ? ) help           ( q ) quit game
 --------------------
-Pick  ['a', 'b', 'c', 'd','r','o','?','q']
+Pick an option: 
+['a', 'b', 'c', 'd','r','o','t','?','q']
 then press enter: d
 --------------------
 Press spacebar to hear the song...
 ```
 
-#### Menu after audio clip is played
+#### Optional Teams menu
 ```
-==================================================
+============================================================
+           Gals              vs               Guys          
+            0                                  0            
+============================================================
 Select one of the following:
 --------------------
-( a ) answer     [artist/title revealed]
-( r ) replay     [first 5 seconds]
-( c ) cheat      [first 15 seconds]
-( w ) whole song [press q to stop]
-( p ) play song  [artist/title revealed]
-( n ) next song
+( 1 ) change score for Gals
+( 2 ) change score for Guys
+ 
+( 3 ) change team name for Gals
+( 4 ) change team name for Guys
+( 5 ) show teams on menus 
+ 
+( q ) quit menu, back to game
+--------------------
+Pick ['1','2','3','4','5','q']
+then press enter:
+```
+
+#### Menu after audio clip is played
+```
+============================================================
+Select one of the following:
+--------------------
+( a ) answer          [artist/title revealed]
+( r ) replay          [first 5 seconds]
+( c ) cheat           [first 15 seconds]
+( w ) whole song      [press q to stop]
+( p ) play song       [artist/title revealed]
+( n ) next song       [return to group selection menu]
+( t ) team menu       [hide/show/rename/score]
 ( ? ) help
 ( q ) quit
 --------------------
-Pick ['a','r','c','w','p','n','?','q']
+Pick ['a','r','c','w','p','n','t','?','q']
 then press enter:  
 ```
 
 #### Selection 'a' is picked
 ```
-==================================================
+============================================================
  
  menu: Classical Music
  
@@ -120,14 +145,14 @@ then press enter:
 
  artist: Ludwig van Beethoven
 
- 
-==================================================
+============================================================
+
 ...press enter to continue
 ```
 
 #### Override mode
 ```
-==================================================
+============================================================
  
  catalog: 101 One Hit Wonders
  
@@ -136,12 +161,12 @@ then press enter:
  or [left](rewind) / [right](forward),
  or [q]uit song, for answer
  
-==================================================
+============================================================
 ```
 
 ##### Override: after "q" is pressed
 ```
-==================================================
+============================================================
  
  catalog: 101 One Hit Wonders
  
@@ -149,7 +174,7 @@ then press enter:
 
  artist: Gerry Rafferty
 
-==================================================
+============================================================
  
  press enter for next song, or q to quit: 
 ```
@@ -161,6 +186,7 @@ Help: To select a song to hear:
 Help:   (a - i)    - pick a song group
 Help:   (r)        - pick a random song
 Help:   (o)        - override mode (continuous play)
+Help:   (t)        - team menu (hide/show/rename/score)
 Help: 
 Help: To hear the first 5 seconds of a song:
 Help:   (spacebar) - when ready, press spacebar to hear the song
@@ -180,8 +206,10 @@ Press enter to exit help
 
 ## Release History
 
+*  0.1.3
+    * added: 2 team naming and scoring option (can be hidden)
 *  0.1.1
-    * Added override menu option for continuous, random play
+    * added: override menu option for continuous, random play
 *  0.0.9
     * code cleanup
     * removed grep command dependency
