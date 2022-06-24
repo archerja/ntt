@@ -7,14 +7,15 @@
 # menu items will be listed by the order below
 #
 
-/media/archerja/My Passport/backup/Music/Compilation/AM Gold 1962 - 1979
-/media/archerja/My Passport/backup/Music/Compilation/Ultimate Seventies/
-/media/archerja/My Passport/backup/Music/Compilation/Flower Power/
-/media/archerja/My Passport/backup/Music/Compilation/Columbia Country Classics/
-/media/archerja/My Passport/backup/Music/Compilation/101 One Hit Wonders/
-/media/archerja/My Passport/backup/Music/Compilation/Disco Fever/
-#/media/archerja/My Passport/backup/Music/Classical/The Top 100 Masterpieces/
-/media/archerja/My Passport/backup/Music/Classical/Great Music Classics/
-/media/archerja/My Passport/backup/Music/Classical/Forever Classics/
-/media/archerja/My Passport/backup/Music/Classical/Andres Segovia/
+/home/pi/music/Misc Rock/
+/home/pi/music/Misc Country/
+/home/pi/music/Songs of the 50s/
+/home/pi/music/Classical Music/
+/home/pi/music/Songs of the 60s/
+#/home/pi/music/not used/
+/home/pi/music/Songs of the 70s/
+/home/pi/music/Songs of the 80s/
+/home/pi/music/Disco Music/
+/home/pi/music/Instrumentals/
+/home/pi/music/Too many directories/
 

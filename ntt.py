@@ -5,31 +5,302 @@
 import os
 import sys
 import random
+import configparser
 
-version = '0.1.3'
+version = '0.1.4'
 
-# --------------------
-# configuration start
+def gamebanner():
+    """
+    create the game banner
+    """
+    clearscreen()
+    print(' ')
+    print(":'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::")
+    print(": ###:: ##:::'## ##::: ###::'###: ##.....::::::::::::::::::::::")
+    print(": ####: ##::'##:. ##:: ####'####: ##:::::::::::::::::::::::::::")
+    print(": ## ## ##:'##:::. ##: ## ### ##: ######:::::::::::::::::::::::")
+    print(": ##. ####: #########: ##. #: ##: ##...::::::::::::::::::::::::")
+    print(": ##:. ###: ##.... ##: ##:.:: ##: ##:::::::::::::::::::::::::::")
+    print(": ##::. ##: ##:::: ##: ##:::: ##: ########:::::::::::::::::::::")
+    print(":..::::..::..:::::..::..:::::..::........::::::::::::::::::::::")
+    print(":::::::::'########:'##::::'##::::'###::::'########:::::::::::::")
+    print(":::::::::... ##..:: ##:::: ##:::'## ##:::... ##..::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##::'##:. ##::::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: #########:'##:::. ##:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##.... ##: #########:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##: ##.... ##:::: ##::::::::::::::::")
+    print(":::::::::::: ##:::: ##:::: ##: ##:::: ##:::: ##::::::::::::::::")
+    print("::::::::::::..:::::..:::::..::..:::::..:::::..:::::::::::::::::")
+    print("::::::::::::::::::::'########:'##::::'##:'##::: ##:'########:::")
+    print("::::::::::::::::::::... ##..:: ##:::: ##: ###:: ##: ##.....::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ####: ##: ##:::::::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ## ## ##: ######:::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##. ####: ##...::::::")
+    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::")
+    print("::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::")
+    print(":::::::::::::::::::::::..::::::.......:::..::::..::........::::")
+    print('    v.' + version)
+    input('                                  Press enter to begin...')
+    print(' ')
 
-# song format extension
-song_ext = '.mp3'
+def clearscreen():
+    """
+    clear the screen with os call
+    """
+    if os.name == "posix":
+        # Linux, Unix, MacOS, Solaris
+        os.system('clear')
+    else:
+        # Windows
+        os.system('cls')
 
-# number of seconds to play
-clipsec = 5
-cheatsec = 10
+def exitbanner():
+    """
+    end the game with a thank you
+    """
+    clearscreen()
+    print(' ')
+    print('-' * 20)
+    print(' ')
+    response = input('Are you sure you want to quit? (Y/y) ')
+    if 'Y' in response.upper():
+        clearscreen()
+        print(' ')
+        print('-' * 20)
+        print(' Thanks for playing ')
+        print('-' * 20)
+        print(' ')
+        sys.exit(0)
 
-# name your file of directories below
-songfile = 'songs'
+def systemshutdown():
+    """
+    completely shutdown the computer
+    """
+    clearscreen()
+    print(' ')
+    print('-' * 20)
+    response = input('Turn the computer off? (Y/y) ')
+    if 'Y' in response.upper():
+        if os.name == "posix":
+            # Linux, Unix, MacOS, Solaris
+            os.system('shutdown -h now')
+        else:
+            # Windows
+            os.system('shutdown /s')
+        sys.exit(0)
 
-# team information
-teamshow = False
-team1name = 'Gals'
-team1score = 0
-team2name = 'Guys'
-team2score = 0
+def help():
+    clearscreen()
+    print(' ')
+    print('Help: To select a song to hear:')
+    print('Help:   (a - i)    - pick a song group')
+    print('Help:   (r)        - pick a random song')
+    print('Help:   (o)        - override mode (continuous play)')
+    print('Help:   (t)        - team menu (hide/show/rename/score)')
+    print('Help: ')
+    print('Help: To hear the first ' + str(clipsec) + ' seconds of a song:')
+    print('Help:   (spacebar) - when ready, press spacebar to hear the song')
+    print('Help: ')
+    print('Help: After hearing the song:')
+    print('Help:   (a) answer   - reveal the artist and title of a song')
+    print('Help:   (r) replay   - hear the first '+ str(clipsec) + ' seconds of a song')
+    print('Help:   (c) cheat    - hear the first '+ str(clipsec + cheatsec) + ' seconds of a song')
+    print('Help:   (w) whole    - hear the whole song (artist/title are hidden)')
+    print('Help:   (p) play     - hear the whole song (reveals song info)')
+    print('Help:   (n) next     - go to next song group selection')
+    print('Help: ')
+    print('Help:   (q) quit     - quit game')
+    print('Help:   (x) exit     - turn off the computer')
+    print(' ')
+    input('Press enter to exit help')
+    clearscreen()
 
-# configuration end
-# --------------------
+def checkmpv():
+    """
+    check that required mpv is installed
+    """
+    if os.name == "posix":
+        # Linux, Unix, MacOS, Solaris
+        chkmpv = os.system('which mpv')
+    else:
+        # Windows
+        chkmpv = os.system('where mpv')
+    if chkmpv != 0:
+       print('* error: could not find mpv executable') 
+       print('* error: make sure mpv is installed')
+       sys.exit(0)
+
+def loadconfig():
+    """
+    load variables from config file
+    """
+    global ini_version
+    global debug
+    global songfile
+    global song_ext
+    global clipsec
+    global cheatsec
+    global teamshow
+    global team1name
+    global team1score
+    global team2name
+    global team2score
+
+    if str(os.path.exists('ntt.ini')) == 'True':
+        config = configparser.ConfigParser()
+        config.read('ntt.ini')
+        
+        ini_version = config.get('app','ini_version')
+        debug = config.getboolean('app','debug')
+        songfile = config.get('song','songfile')
+        song_ext = config.get('song','song_ext')
+        clipsec = config.getint('song','clipsec')
+        cheatsec = config.getint('song','cheatsec')
+    
+        teamshow = config.getboolean('team','teamshow')
+        team1name = config.get('team','team1name')
+        team1score = config.getint('team','team1score')
+        team2name = config.get('team','team2name')
+        team2score = config.getint('team','team2score')
+
+        #debug...
+        if debug:
+            print('debug...')
+            for section_name in config.sections():
+                print('Section:', section_name)
+                #print('  Options:', config.options(section_name))
+                for name, value in config.items(section_name):
+                    print('  %s = %s' % (name, value))
+            input('...debug')
+        #...debug
+
+    else:
+        print('* error: could not find ntt.ini') 
+        response = input('Do you want to create the config file? (Y/y) ')
+        if 'Y' in response.upper():
+            ini_version = version
+            debug = False
+            song_ext = '.mp3'
+            clipsec = 5
+            cheatsec = 10
+            songfile = 'songs'
+            teamshow = False
+            team1name = 'Gals'
+            team1score = '0'
+            team2name = 'Guys'
+            team2score = '0'
+            saveconfig() 
+        sys.exit(0)
+
+def saveconfig():
+    """
+    save variables to config file
+    """
+    config = configparser.ConfigParser()
+    config.read('ntt.ini')
+
+    if not config.has_section('app'):
+        config.add_section('app')
+    if not config.has_section('song'):
+        config.add_section('song')
+    if not config.has_section('team'):
+        config.add_section('team')
+
+    config['app']['ini_version'] = ini_version
+    if debug:
+        config['app']['debug'] = 'True'
+    else:
+        config['app']['debug'] = 'False'
+
+    config['song']['song_ext'] = song_ext
+    config['song']['clipsec'] = str(clipsec)
+    config['song']['cheatsec'] = str(cheatsec)
+    config['song']['songfile'] = songfile
+
+    if teamshow:
+       config['team']['teamshow'] = 'True'
+    else:
+       config['team']['teamshow'] = 'False'
+    config['team']['team1name'] = team1name
+    config['team']['team1score'] = str(team1score)
+    config['team']['team2name'] = team2name
+    config['team']['team2score'] = str(team2score)
+
+    with open('ntt.ini', 'w') as newini:
+       config.write(newini)
+
+def teamscores():
+    """
+    display team names and scores
+    """
+    global teamshow
+    if teamshow:
+        print('=' * 60)
+        print(team1name.center(25) + ' vs '.center(10) + team2name.center(25))
+        print(str(team1score).center(25) + ' '.center(10) + str(team2score).center(25))
+
+def teammenu():
+    global teamshow
+    global team1name
+    global team2name
+    global team1score
+    global team2score
+    status3 = True
+    while status3:
+        clearscreen()
+        teamscores()
+        print('=' * 60)
+        print('Select one of the following:')
+        print('-' * 20)
+        print('( 1 ) change score for ' + team1name)
+        print('( 2 ) change score for ' + team2name)
+        print(' ')
+        print('( 3 ) change team name for ' + team1name)
+        print('( 4 ) change team name for ' + team2name)
+        print('( 5 ) show/hide teams on menus ')
+        print(' ')
+        print('( r ) reset scores/names/hide')
+        print('( s ) save, and go back to game')
+        print('-' * 20)
+        print("Pick ['1','2','3','4','5','r','s']")
+        response = input('then press enter: ')
+        if 's' in response:
+            saveconfig()
+            status3 = False
+        elif 'r' in response:
+            team1name = 'Gals'
+            team1score = 0
+            team2name = 'Guys'
+            team2score = 0
+            teamshow = False
+            continue
+        elif '?' in response:
+            help()
+            continue
+        elif '1' in response:
+            newscore = input('enter new score: ')
+            team1score = newscore
+            continue
+        elif '2' in response:
+            newscore = input('enter new score: ')
+            team2score = newscore
+            continue
+        elif '3' in response:
+            newname = input('enter new name: ')
+            team1name = newname
+            continue
+        elif '4' in response:
+            newname = input('enter new name: ')
+            team2name = newname
+            continue
+        elif '5' in response:
+            if teamshow:
+                teamshow = False
+            else:
+                teamshow = True
+            continue
+        else:
+            continue
 
 def makelist(listnum,listpath):
     """
@@ -72,6 +343,15 @@ def getlocations():
                         pathnum = pathnum + 1
                         pathlist.append([pathnum,line])
                         menu['menu'+ str(pathnum)] = {'pick_num': pathnum, 'song_total': 0, 'song_group': pathlist[pathnum - 1][1].split('/')[-2], 'folder_path': line}
+
+            #debug...
+            if debug:
+                print('debug...')
+                for x in range(len(pathlist)):
+                    print(pathlist[x])
+                input('...debug')
+            #...debug
+
         print('loading music from: ')
         print(' ')
         for k in range(0,len(pathlist)):
@@ -82,6 +362,18 @@ def getlocations():
         print('* error: could not find file [' + songfile + ']') 
         print('* error: check current directory')
         sys.exit(0)
+
+    #debug...
+    if debug:
+        print(' ')
+        print('debug...')
+        for key, value in menu.items():
+            print(key, '::')
+            for p, s in value.items():
+                print(p, ' : ', s)
+        input('...debug')
+    #...debug
+
     return
 
 def pickcount(songs,pick):
@@ -100,93 +392,47 @@ def songinfo(song,info):
         if info in line:
           return line
 
-def clearscreen():
-    """
-    clear the screen with os call
-    """
-    if os.name == "posix":
-        # Linux, Unix, MacOS, Solaris
-        os.system('clear')
-    else:
-        # Windows
-        os.system('cls')
+def override():
+    for k in songs:
+        if k[0] in range(1,9):
+             catalog = ' catalog: ' +  k[2].split('/')[-1].split(' - ')[0]
+             clearscreen()
+             print('=' * 60)
+             print(' ')
+             print(catalog)
+             print(' ')
+             print(' listen to the whole song,')
+             print(' or [space] to pause,')
+             print(' or [left](rewind) / [right](forward),')
+             print(' or [q]uit playing the song, reveal the answer')
+             print(' ')
+             print('=' * 60)
 
-def gamebanner():
-    """
-    create the game banner
-    """
-    clearscreen()
-    print(' ')
-    print(":'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::")
-    print(": ###:: ##:::'## ##::: ###::'###: ##.....::::::::::::::::::::::")
-    print(": ####: ##::'##:. ##:: ####'####: ##:::::::::::::::::::::::::::")
-    print(": ## ## ##:'##:::. ##: ## ### ##: ######:::::::::::::::::::::::")
-    print(": ##. ####: #########: ##. #: ##: ##...::::::::::::::::::::::::")
-    print(": ##:. ###: ##.... ##: ##:.:: ##: ##:::::::::::::::::::::::::::")
-    print(": ##::. ##: ##:::: ##: ##:::: ##: ########:::::::::::::::::::::")
-    print(":..::::..::..:::::..::..:::::..::........::::::::::::::::::::::")
-    print(":::::::::'########:'##::::'##::::'###::::'########:::::::::::::")
-    print(":::::::::... ##..:: ##:::: ##:::'## ##:::... ##..::::::::::::::")
-    print(":::::::::::: ##:::: ##:::: ##::'##:. ##::::: ##::::::::::::::::")
-    print(":::::::::::: ##:::: #########:'##:::. ##:::: ##::::::::::::::::")
-    print(":::::::::::: ##:::: ##.... ##: #########:::: ##::::::::::::::::")
-    print(":::::::::::: ##:::: ##:::: ##: ##.... ##:::: ##::::::::::::::::")
-    print(":::::::::::: ##:::: ##:::: ##: ##:::: ##:::: ##::::::::::::::::")
-    print("::::::::::::..:::::..:::::..::..:::::..:::::..:::::::::::::::::")
-    print("::::::::::::::::::::'########:'##::::'##:'##::: ##:'########:::")
-    print("::::::::::::::::::::... ##..:: ##:::: ##: ###:: ##: ##.....::::")
-    print("::::::::::::::::::::::: ##:::: ##:::: ##: ####: ##: ##:::::::::")
-    print("::::::::::::::::::::::: ##:::: ##:::: ##: ## ## ##: ######:::::")
-    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##. ####: ##...::::::")
-    print("::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::")
-    print("::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::")
-    print(":::::::::::::::::::::::..::::::.......:::..::::..::........::::")
-    print('    v.' + version)
-    input('                                  Press enter to begin...')
-    print(' ')
+             #debug...
+             if debug:
+                 print('debug...')
+                 print(k)
+                 input('...debug')
+             #...debug
 
-def exitbanner():
-    """
-    end the game with a thank you
-    """
-    clearscreen()
-    print(' ')
-    print('-' * 20)
-    print(' ')
-    response = input('Are you sure you want to quit? (Y/y) ')
-    if 'Y' in response.upper():
-        clearscreen()
-        print(' ')
-        print('-' * 20)
-        print(' Thanks for playing ')
-        print('-' * 20)
-        print(' ')
-        sys.exit(0)
-
-def help():
-    clearscreen()
-    print(' ')
-    print('Help: To select a song to hear:')
-    print('Help:   (a - i)    - pick a song group')
-    print('Help:   (r)        - pick a random song')
-    print('Help:   (o)        - override mode (continuous play)')
-    print('Help:   (t)        - team menu (hide/show/rename/score)')
-    print('Help: ')
-    print('Help: To hear the first ' + str(clipsec) + ' seconds of a song:')
-    print('Help:   (spacebar) - when ready, press spacebar to hear the song')
-    print('Help: ')
-    print('Help: After hearing the song:')
-    print('Help:   (a) answer   - reveal the artist and title of a song')
-    print('Help:   (r) replay   - hear the first '+ str(clipsec) + ' seconds of a song')
-    print('Help:   (c) cheat    - hear the first '+ str(clipsec + cheatsec) + ' seconds of a song')
-    print('Help:   (w) whole    - hear the whole song (artist/title are hidden)')
-    print('Help:   (p) play     - hear the whole song (reveals song info)')
-    print('Help:   (n) next     - go to next song group selection')
-    print('Help: ')
-    print('Help:   (q) quit     - quit game')
-    print(' ')
-    input('Press enter to exit help')
-    clearscreen()
+             os.system('mpv --really-quiet --start=0 ' + '"' +  k[2] + '"')
+             answer_title = songinfo(k[2],'title:')
+             answer_artist = songinfo(k[2],'artist:')
+             clearscreen()
+             print('=' * 60)
+             print(' ')
+             print(catalog)
+             print(' ')
+             print(answer_title)
+             print(answer_artist)
+             print('=' * 60)
+             print(' ')
+             response = input(' press enter for the next song, or q to quit: ')
+             if 'q' in response:
+                 exitbanner()
+             else:
+                 continue
+    exitbanner()
 
 def loadmenu():
     """
@@ -196,7 +442,9 @@ def loadmenu():
     teamscores()
     print('=' * 60)
     global menu_opts
+    global menu_extras
     menu_opts = []
+    menu_extras = ['o','t','?','q','x']
     print('Select one of the ' + str(len(songs)) + ' following songs: ')
     print('-' * 20)
     if menu.get('menu1'):
@@ -240,9 +488,10 @@ def loadmenu():
     menu_opts.append('t')
     menu_opts.append('?')
     menu_opts.append('q')
+    menu_opts.append('x')
     print('-' * 10)
     print('( r ) Random song    ( o ) Override mode    ( t ) Team menu')
-    print('( ? ) help           ( q ) quit game')
+    print('( ? ) help           ( q ) quit game        ( x ) Shutdown')
     print('-' * 20)
 
 def loadgame():
@@ -264,110 +513,12 @@ def loadgame():
     random.shuffle(songs)
     random.shuffle(songs)
 
-def teamscores():
-    """
-    display team names and scores
-    """
-    global teamshow
-    if teamshow:
-        print('=' * 60)
-        #print(' ')
-        print(team1name.center(25) + ' vs '.center(10) + team2name.center(25))
-        print(str(team1score).center(25) + ' '.center(10) + str(team2score).center(25))
-        #print(' ')
-
-def teammenu():
-    global teamshow
-    global team1name
-    global team2name
-    global team1score
-    global team2score
-    status3 = True
-    while status3:
-        clearscreen()
-        teamscores()
-        print('=' * 60)
-        print('Select one of the following:')
-        print('-' * 20)
-        print('( 1 ) change score for ' + team1name)
-        print('( 2 ) change score for ' + team2name)
-        print(' ')
-        print('( 3 ) change team name for ' + team1name)
-        print('( 4 ) change team name for ' + team2name)
-        print('( 5 ) show teams on menus ')
-        print(' ')
-        print('( q ) quit menu, back to game')
-        print('-' * 20)
-        print("Pick ['1','2','3','4','5','q']")
-        response = input('then press enter: ')
-        if 'q' in response:
-            status3 = False
-        elif '?' in response:
-            help()
-            continue
-        elif '1' in response:
-            newscore = input('enter new score: ')
-            team1score = newscore
-            continue
-        elif '2' in response:
-            newscore = input('enter new score: ')
-            team2score = newscore
-            continue
-        elif '3' in response:
-            newname = input('enter new name: ')
-            team1name = newname
-            continue
-        elif '4' in response:
-            newname = input('enter new name: ')
-            team2name = newname
-            continue
-        elif '5' in response:
-            if teamshow:
-                teamshow = False
-            else:
-                teamshow = True
-            continue
-        else:
-            continue
-
-def override():
-    for k in songs:
-        if k[0] in range(1,9):
-             catalog = ' catalog: ' +  k[2].split('/')[-1].split(' - ')[0]
-             clearscreen()
-             print('=' * 60)
-             print(' ')
-             print(catalog)
-             print(' ')
-             print(' listen to the whole song,')
-             print(' or [space] to pause,')
-             print(' or [left](rewind) / [right](forward),')
-             print(' or [q]uit playing the song, reveal the answer')
-             print(' ')
-             print('=' * 60)
-             os.system('mpv --really-quiet --start=0 ' + '"' +  k[2] + '"')
-             answer_title = songinfo(k[2],'title:')
-             answer_artist = songinfo(k[2],'artist:')
-             clearscreen()
-             print('=' * 60)
-             print(' ')
-             print(catalog)
-             print(' ')
-             print(answer_title)
-             print(answer_artist)
-             print('=' * 60)
-             print(' ')
-             response = input(' press enter for the next song, or q to quit: ')
-             if 'q' in response:
-                 exitbanner()
-             else:
-                 continue
-    exitbanner()
-
 def main():
     """
     let's have some fun
     """
+    loadconfig()
+    checkmpv()
     loadgame()
     picklist = 0
     for j in range(0,len(songs)-1):
@@ -376,11 +527,14 @@ def main():
             while status:
                 loadmenu()
                 print('Pick an option: ')
-                print(menu_opts)
+                print('  ', [item for item in menu_opts if item not in menu_extras])
+                print('  ', menu_extras)
                 response = input('then press enter: ')
                 if response in menu_opts:
                     if 'q' in response:
                         exitbanner()
+                    elif 'x' in response:
+                        systemshutdown()
                     elif '?' in response:
                         help()
                         continue
@@ -428,6 +582,14 @@ def main():
             picklist = 0
         else:
             continue
+
+        #debug...
+        if debug:
+            print('debug...')
+            print(j, ' - ', songs[j][2])
+            input('...debug')
+        #...debug
+
         print('-' * 20)
         print('Press spacebar to hear the song...')
         os.system('mpv --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
@@ -488,4 +650,5 @@ def main():
 if __name__ == '__main__':
 
     main()
+
 
