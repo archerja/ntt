@@ -31,7 +31,7 @@ It works really well with compilation albums (various artists). I use it with a 
 ::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::
 ::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::
 :::::::::::::::::::::::..::::::.......:::..::::..::........::::
-    v.0.1.5
+    v.0.1.6 (ini: 0.1.6 )
                                   Press enter to begin...
 ```
 
@@ -47,7 +47,8 @@ It works really well with compilation albums (various artists). I use it with a 
 * Override mode, for continuous, random play. (speed round)
 * Two team hide/show (with team naming and scoring).
 
-> Note: Settings for number of clip seconds, team names and scores, filename for song directories, etc. can be changed in configuration file (ntt.ini).
+#### Note:
+* Settings for number of clip seconds, team names and scores, music directory, etc. can be changed in configuration file (ntt.ini).
 
 ## Background
 
@@ -123,7 +124,7 @@ Select one of the 1127 following songs:
 --------------------
 Pick an option:
    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'r']
-   ['o', 's', 't', '?', 'q', 'x']
+   ['o', 't', '?', 'q', 'x']
 then press enter:
 ```
 
@@ -237,7 +238,6 @@ Help: To select a song to hear:
 Help:   (a - i)    - pick a song group
 Help:   (r)        - pick a random song
 Help:   (o)        - override mode (continuous play)
-Help:   (s)        - re-shuffle all songs
 Help:   (t)        - team menu (hide/show/rename/score)
 Help:
 Help: To hear the first 5 seconds of a song:
@@ -258,6 +258,9 @@ Press enter to exit help
 ```
 
 ## Release History
+*  0.1.6
+    *  code cleanup, lots of code cleanup
+    *  removed shuffle, better random generate used
 *  0.1.5
     *  now works on music directory instead of directory list from a file
     *  added ability to re-shuffle
