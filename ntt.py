@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 # requires mpv
+# https://mpv.io
 
 import os
 import sys
 import random
 import configparser
 
-version = '0.1.4'
+version = '0.1.5'
 
 def gamebanner():
     """
@@ -96,6 +97,7 @@ def help():
     print('Help:   (a - i)    - pick a song group')
     print('Help:   (r)        - pick a random song')
     print('Help:   (o)        - override mode (continuous play)')
+    print('Help:   (s)        - re-shuffle all songs')
     print('Help:   (t)        - team menu (hide/show/rename/score)')
     print('Help: ')
     print('Help: To hear the first ' + str(clipsec) + ' seconds of a song:')
@@ -135,8 +137,9 @@ def loadconfig():
     load variables from config file
     """
     global ini_version
+    global shuffle_count
     global debug
-    global songfile
+    global song_path
     global song_ext
     global clipsec
     global cheatsec
@@ -151,8 +154,9 @@ def loadconfig():
         config.read('ntt.ini')
         
         ini_version = config.get('app','ini_version')
+        shuffle_count = config.getint('app','shuffle_count')
         debug = config.getboolean('app','debug')
-        songfile = config.get('song','songfile')
+        song_path = config.get('song','song_path')
         song_ext = config.get('song','song_ext')
         clipsec = config.getint('song','clipsec')
         cheatsec = config.getint('song','cheatsec')
@@ -179,11 +183,12 @@ def loadconfig():
         response = input('Do you want to create the config file? (Y/y) ')
         if 'Y' in response.upper():
             ini_version = version
+            shuffle_count = 3
             debug = False
             song_ext = '.mp3'
             clipsec = 5
             cheatsec = 10
-            songfile = 'songs'
+            song_path = 'music'
             teamshow = False
             team1name = 'Gals'
             team1score = '0'
@@ -207,15 +212,16 @@ def saveconfig():
         config.add_section('team')
 
     config['app']['ini_version'] = ini_version
+    config['app']['shuffle_count'] = str(shuffle_count)
     if debug:
         config['app']['debug'] = 'True'
     else:
         config['app']['debug'] = 'False'
 
+    config['song']['song_path'] = song_path
     config['song']['song_ext'] = song_ext
     config['song']['clipsec'] = str(clipsec)
     config['song']['cheatsec'] = str(cheatsec)
-    config['song']['songfile'] = songfile
 
     if teamshow:
        config['team']['teamshow'] = 'True'
@@ -328,40 +334,36 @@ def getlocations():
     global menu
     menu = {}
     pathnum = 0
-    if str(os.path.exists(songfile)) == 'True':
-        with open(songfile) as f:
-            for line in f:
-                if line[0] == '#' or line[0] == '\n':
-                    continue
-                else:
-                    line = line.strip('\n')
-                    if line[-1:] == '/':
-                        pass
-                    else:
-                        line = line + '/'
-                    if pathnum < 10 and os.path.isdir(line):
-                        pathnum = pathnum + 1
-                        pathlist.append([pathnum,line])
-                        menu['menu'+ str(pathnum)] = {'pick_num': pathnum, 'song_total': 0, 'song_group': pathlist[pathnum - 1][1].split('/')[-2], 'folder_path': line}
+    dirlist = [os.path.join(song_path, filename) for filename in os.listdir(song_path)]
+    dirlist.sort()
 
-            #debug...
-            if debug:
-                print('debug...')
-                for x in range(len(pathlist)):
-                    print(pathlist[x])
-                input('...debug')
-            #...debug
+    #debug...
+    if debug:
+        print('debug...')
+        #cwd = os.getcwd()
+        #print(cwd)
+        print(dirlist)
+        input('...debug')
+    #...debug
 
-        print('loading music from: ')
-        print(' ')
-        for k in range(0,len(pathlist)):
-            for q in range(0,len(pathlist[k])):
-                continue
-            makelist(pathlist[k][0], pathlist[k][1])
-    else:
-        print('* error: could not find file [' + songfile + ']') 
-        print('* error: check current directory')
-        sys.exit(0)
+    for dlist in dirlist:
+        if pathnum < 10 and os.path.isdir(dlist):
+            pathnum = pathnum + 1
+            pathlist.append([pathnum,dlist])
+            menu['menu'+ str(pathnum)] = {'pick_num': pathnum, 'song_total': 0, 'song_group': pathlist[pathnum - 1][1].split('/')[-1], 'folder_path': dlist}
+
+    #debug...
+    if debug:
+        print('debug...')
+        for x in range(len(pathlist)):
+            print(pathlist[x])
+        input('...debug')
+    #...debug
+
+    print('loading music from: ')
+    print(' ')
+    for k in range(0,len(pathlist)):
+        makelist(pathlist[k][0], pathlist[k][1])
 
     #debug...
     if debug:
@@ -415,7 +417,7 @@ def override():
                  input('...debug')
              #...debug
 
-             os.system('mpv --really-quiet --start=0 ' + '"' +  k[2] + '"')
+             os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' +  k[2] + '"')
              answer_title = songinfo(k[2],'title:')
              answer_artist = songinfo(k[2],'artist:')
              clearscreen()
@@ -444,7 +446,7 @@ def loadmenu():
     global menu_opts
     global menu_extras
     menu_opts = []
-    menu_extras = ['o','t','?','q','x']
+    menu_extras = ['o','s','t','?','q','x']
     print('Select one of the ' + str(len(songs)) + ' following songs: ')
     print('-' * 20)
     if menu.get('menu1'):
@@ -485,6 +487,7 @@ def loadmenu():
             menu_opts.append('i')
     menu_opts.append('r')
     menu_opts.append('o')
+    menu_opts.append('s')
     menu_opts.append('t')
     menu_opts.append('?')
     menu_opts.append('q')
@@ -507,11 +510,17 @@ def loadgame():
         print('* error: No songs loaded in game...')
         print('* error: Check file for correct directory paths...')
         sys.exit(0)
-    print(' ')
+    shuffle_songs()
+
+def shuffle_songs():
+    clearscreen()
     print('shuffling ' + str(len(songs)) + ' total songs...')
-    random.shuffle(songs)
-    random.shuffle(songs)
-    random.shuffle(songs)
+    for s in range(0,shuffle_count):
+        print('shuffling...')
+        random.shuffle(songs)
+    print('... all songs are shuffled ...')
+    if debug:
+        input('...debug')
 
 def main():
     """
@@ -573,6 +582,10 @@ def main():
                     elif 'o' in response:
                         override()
                         status = False
+                    elif 's' in response:
+                        shuffle_songs()
+                        input('... press enter when ready ...')
+                        status = False
                     elif 't' in response:
                         teammenu()
                         continue
@@ -592,7 +605,7 @@ def main():
 
         print('-' * 20)
         print('Press spacebar to hear the song...')
-        os.system('mpv --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
+        os.system('mpv --ao=alsa --no-audio-display --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
         # load answer
         answer_title = songinfo(songs[j][2],'title:')
         answer_artist = songinfo(songs[j][2],'artist:')
@@ -635,13 +648,13 @@ def main():
                 print('=' * 60)
                 input('...press enter to continue')
             elif 'r' in response:
-                os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  songs[j][2] + '"')
             elif 'c' in response:
-                os.system('mpv --really-quiet --start=0 --end=' + str(clipsec + cheatsec + 1) + ' "' +  songs[j][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + cheatsec + 1) + ' "' +  songs[j][2] + '"')
             elif 'w' in response:
-                os.system('mpv --really-quiet --start=0 ' + '"' +  songs[j][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' +  songs[j][2] + '"')
             elif 'p' in response:
-                os.system('mpv "' +  songs[j][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display "' +  songs[j][2] + '"')
             elif 'n' in response:
                 status2 = False
             else:
