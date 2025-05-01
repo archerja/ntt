@@ -5,6 +5,11 @@ This python3 script will create a menu from a local directory, using up to 9 dif
 
 It works really well with compilation albums (various artists). I use it with a Raspberry Pi connected to my TV. I use a 128 GB SD card, without GUI, and a display resolution of 640x480 60Hz 4:3 (CEA Mode 1).
 
+### NEW!
+* An intro song can be added at the start banner, so that the volume can be adjusted before the game begins.
+* Will now track all played songs, in each menu category, so that it can not be played again.
+* If all songs in a menu category have been played, that menu can not be pick anymore.
+
 ### An ode to Arcade banner:
 ```
 :'##::: ##::::'###::::'##::::'##:'########:::::::::::::::::::::
@@ -31,8 +36,8 @@ It works really well with compilation albums (various artists). I use it with a 
 ::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::
 ::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::
 :::::::::::::::::::::::..::::::.......:::..::::..::........::::
-    v.0.1.6 (ini: 0.1.6 )
-                                  Press enter to begin...
+    v.0.1.7                      Check your volume...
+                                      Press enter to begin...
 ```
 
 ## Some of the options
@@ -48,7 +53,7 @@ It works really well with compilation albums (various artists). I use it with a 
 * Two team hide/show (with team naming and scoring).
 
 #### Note:
-* Settings for number of clip seconds, team names and scores, music directory, etc. can be changed in configuration file (ntt.ini).
+* Settings for number of clip seconds, team names and scores, music directory, intro song, etc. can be changed in the configuration file (ntt.ini).
 
 ## Background
 
@@ -107,17 +112,17 @@ music
            Gals              vs               Guys
             0                                  0
 ============================================================
-Select one of the 1127 following songs:
+Select one of the 1127 following songs: 0 played
 --------------------
-( a ) Classical Music (19 songs)
-( b ) Disco Music (58 songs)
-( c ) Instrumentals (466 songs)
-( d ) Misc Country (113 songs)
-( e ) Misc Rock  (160 songs)
-( f ) Songs of the 50s (86 songs)
-( g ) Songs of the 60s (58 songs)
-( h ) Songs of the 70s (60 songs)
-( i ) Songs of the 80s (97 songs)
+( a ) Classical Music (19/19 songs)
+( b ) Disco Music (58/58 songs)
+( c ) Instrumentals (466/466 songs)
+( d ) Misc Country (113/113 songs)
+( e ) Misc Rock  (160/160 songs)
+( f ) Songs of the 50s (86/86 songs)
+( g ) Songs of the 60s (58/58 songs)
+( h ) Songs of the 70s (60/60 songs)
+( i ) Songs of the 80s (97/97 songs)
 ----------
 ( r ) Random song    ( o ) Override mode    ( t ) Team menu
 ( ? ) help           ( q ) quit game        ( x ) Shutdown
@@ -175,6 +180,7 @@ then press enter:
 #### Note:
 * Enter will return to previous menu.
 * Select next song "n", to start next round.
+* Menu selection "a" will now show "( a ) Classical Music (18/19 songs)"
 
 #### Optional Teams menu
 ```
@@ -258,6 +264,13 @@ Press enter to exit help
 ```
 
 ## Release History
+*  0.1.7
+    *  can play an intro song, to adjust volume
+    *  code cleanup with better logic
+    *  team scores now show on default
+    *  tracks all songs played
+    *  played songs can not be picked again
+    *  locks menu option if all songs in menu are picked
 *  0.1.6
     *  code cleanup, lots of code cleanup
     *  removed shuffle, better random generate used

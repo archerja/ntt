@@ -8,7 +8,7 @@ import sys
 import random
 import configparser
 
-version = '0.1.6'
+version = '0.1.7'
 
 def gamebanner():
     """
@@ -40,8 +40,9 @@ def gamebanner():
     print("::::::::::::::::::::::: ##:::: ##:::: ##: ##:. ###: ##:::::::::")
     print("::::::::::::::::::::::: ##::::. #######:: ##::. ##: ########:::")
     print(":::::::::::::::::::::::..::::::.......:::..::::..::........::::")
-    print('    version: ' + version + ' (ini: ' + ini_version + ' )')
-    input('                                  Press enter to begin...')
+    print('    version: ' + version + '               Check your volume...')
+    playintro()
+    input('                                      Press enter to begin...')
     print(' ')
 
 def clearscreen():
@@ -63,7 +64,7 @@ def exitbanner():
     print(' ')
     print('-' * 20)
     print(' ')
-    response = input('Are you sure you want to quit? (Y/y) ')
+    response = input('Are you sure you want to quit? (N/y) ')
     if 'Y' in response.upper():
         clearscreen()
         print(' ')
@@ -80,7 +81,7 @@ def systemshutdown():
     clearscreen()
     print(' ')
     print('-' * 20)
-    response = input('Turn the computer off? (Y/y) ')
+    response = input('Turn the computer off? (N/y) ')
     if 'Y' in response.upper():
         if os.name == "posix":
             # Linux, Unix, MacOS, Solaris
@@ -132,6 +133,13 @@ def checkmpv():
        print('* NTT error: https://mpv.io')
        sys.exit(0)
 
+def playintro():
+    """
+    use mpv to play intro song to adjust volume
+    """
+    os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(introsec + 1) + ' "' +  intro_song + '"')
+    return
+
 # -----------------------------------------------------------
 
 def loadconfig():
@@ -140,6 +148,8 @@ def loadconfig():
     """
     global ini_version
     global debug
+    global intro_song
+    global introsec
     global song_path
     global song_ext
     global clipsec
@@ -156,6 +166,8 @@ def loadconfig():
         
         ini_version = config.get('app','ini_version')
         debug = config.getboolean('app','debug')
+        intro_song = config.get('app','intro_song')
+        introsec = config.getint('app','introsec')
         song_path = config.get('song','song_path')
         song_ext = config.get('song','song_ext')
         clipsec = config.getint('song','clipsec')
@@ -169,20 +181,23 @@ def loadconfig():
 
     else:
         print('* NTT error: could not find ntt.ini') 
-        response = input('Do you want to create the config file? (Y/y) ')
+        response = input('Do you want to create the config file? (N/y) ')
         if 'Y' in response.upper():
             ini_version = version
             debug = False
+            intro_song = 'intro.mp3'
+            introsec = 17
             song_ext = '.mp3'
             clipsec = 5
             cheatsec = 10
             song_path = 'music'
-            teamshow = False
+            teamshow = True
             team1name = 'Gals'
             team1score = '0'
             team2name = 'Guys'
             team2score = '0'
             saveconfig() 
+            print('Config file created. Please restart program.')
         sys.exit(0)
 
 def saveconfig():
@@ -204,6 +219,8 @@ def saveconfig():
         config['app']['debug'] = 'True'
     else:
         config['app']['debug'] = 'False'
+    config['app']['intro_song'] = intro_song
+    config['app']['introsec'] = str(introsec)
 
     config['song']['song_path'] = song_path
     config['song']['song_ext'] = song_ext
@@ -267,7 +284,7 @@ def teammenu():
             team1score = 0
             team2name = 'Guys'
             team2score = 0
-            teamshow = False
+            teamshow = True
             continue
         elif '?' in response:
             help()
@@ -305,6 +322,7 @@ def getSongList():
     """
     global menu
     menu = {}
+    songIndex = 0
     indexNum = 0
     if os.path.isdir(song_path):
         dirList = [os.path.join(song_path, filename) for filename in os.listdir(song_path)]
@@ -316,9 +334,10 @@ def getSongList():
         sys.exit(0)
     tempSongs = []
     indexed = True
+    selected = False
     for dlist in dirList:
         if indexed:
-            indexNum = indexNum + 1
+            indexNum += 1
         if indexNum < 10 and os.path.isdir(dlist):
             songNum = 0
             tempSongs.clear()
@@ -327,8 +346,9 @@ def getSongList():
                 for name in sorted(files):
                     if name[-4:].lower() == song_ext:
                         path = os.path.join(root,name)
-                        songNum = songNum + 1
-                        tempSongs.append([indexNum,songNum,path])
+                        songNum += 1
+                        songIndex += 1
+                        tempSongs.append([songIndex,indexNum,songNum,path,selected])
                 if len(tempSongs) > 0:
                     songs.extend(tempSongs)
                     tempSongs.clear()
@@ -337,6 +357,18 @@ def getSongList():
                 else:
                     indexed = False
     return songs
+
+def songSelected(idx,song):
+    x = [x for x in songs if x[1] == idx and x[2] == song]
+    xx = x[0][0] - 1
+    songs[xx][4] = True
+    songsPlayed()
+
+def songsPlayed():
+    global played
+    played = []
+    played.clear()
+    played = [x for x in songs if x[4] == True]
 
 def songinfo(song,info):
     """
@@ -351,10 +383,10 @@ def override():
     overidden = True
     while overidden:
         randPick = random.randint(1,len(songs))
-        picked = songs[randPick][0]
-        randSong = songs[randPick][1]
-        pickedSong = [x for x in songs if x[0] == picked and x[1] == randSong]
-        catalog = ' catalog: ' +  pickedSong[0][2].split('/')[-1].split(' - ')[0]
+        picked = songs[randPick][1]
+        randSong = songs[randPick][2]
+        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong]
+        catalog = ' catalog: ' +  pickedSong[0][3].split('/')[-1].split(' - ')[0]
         clearscreen()
         print('=' * 60)
         print(' ')
@@ -367,9 +399,9 @@ def override():
         print(' ')
         print('=' * 60)
 
-        os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' + pickedSong[0][2]  + '"')
-        answerTitle = songinfo(pickedSong[0][2],'title:')
-        answerArtist = songinfo(pickedSong[0][2],'artist:')
+        os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' + pickedSong[0][3]  + '"')
+        answerTitle = songinfo(pickedSong[0][3],'title:')
+        answerArtist = songinfo(pickedSong[0][3],'artist:')
         clearscreen()
         print('=' * 60)
         print(' ')
@@ -396,48 +428,67 @@ def loadmenu():
     global menu_opts
     global menu_extras
     menu_opts = []
-    menu_extras = ['o','t','?','q','x']
-    print('Select one of the ' + str(len(songs)) + ' following songs: ')
+    menu_extras = ['o','t','?','q','x','u']
+    print('Select one of the ' +  str(len(songs)) + ' following songs: ' + str(len(played)) + ' played')
     print('-' * 20)
     if menu.get('menu1'):
         if menu['menu1']['songTotal'] > 0:
-            print('( a )', menu['menu1']['songGroup'], '(' + str(menu['menu1']['songTotal']) + ' songs)')
-            menu_opts.append('a')
+            availSongs = [x for x in songs if x[1] == 1 and x[4] == False]
+            print('( a )', menu['menu1']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu1']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('a')
     if menu.get('menu2'):
         if menu['menu2']['songTotal'] > 0:
-            print('( b )', menu['menu2']['songGroup'], '(' + str(menu['menu2']['songTotal']) + ' songs)')
-            menu_opts.append('b')
+            availSongs = [x for x in songs if x[1] == 2 and x[4] == False]
+            print('( b )', menu['menu2']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu2']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('b')
     if menu.get('menu3'):
         if menu['menu3']['songTotal'] > 0:
-            print('( c )', menu['menu3']['songGroup'], '(' + str(menu['menu3']['songTotal']) + ' songs)')
-            menu_opts.append('c')
+            availSongs = [x for x in songs if x[1] == 3 and x[4] == False]
+            print('( c )', menu['menu3']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu3']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('c')
     if menu.get('menu4'):
         if menu['menu4']['songTotal'] > 0:
-            print('( d )', menu['menu4']['songGroup'], '(' + str(menu['menu4']['songTotal']) + ' songs)')
-            menu_opts.append('d')
+            availSongs = [x for x in songs if x[1] == 4 and x[4] == False]
+            print('( d )', menu['menu4']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu4']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('d')
     if menu.get('menu5'):
         if menu['menu5']['songTotal'] > 0:
-            print('( e )', menu['menu5']['songGroup'], '(' + str(menu['menu5']['songTotal']) + ' songs)')
-            menu_opts.append('e')
+            availSongs = [x for x in songs if x[1] == 5 and x[4] == False]
+            print('( e )', menu['menu5']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu5']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('e')
     if menu.get('menu6'):
         if menu['menu6']['songTotal'] > 0:
-            print('( f )', menu['menu6']['songGroup'], '(' + str(menu['menu6']['songTotal']) + ' songs)')
-            menu_opts.append('f')
+            availSongs = [x for x in songs if x[1] == 6 and x[4] == False]
+            print('( f )', menu['menu6']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu6']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('f')
     if menu.get('menu7'):
         if menu['menu7']['songTotal'] > 0:
-            print('( g )', menu['menu7']['songGroup'], '(' + str(menu['menu7']['songTotal']) + ' songs)')
-            menu_opts.append('g')
+            availSongs = [x for x in songs if x[1] == 7 and x[4] == False]
+            print('( g )', menu['menu7']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu7']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('g')
     if menu.get('menu8'):
         if menu['menu8']['songTotal'] > 0:
-            print('( h )', menu['menu8']['songGroup'], '(' + str(menu['menu8']['songTotal']) + ' songs)')
-            menu_opts.append('h')
+            availSongs = [x for x in songs if x[1] == 8 and x[4] == False]
+            print('( h )', menu['menu8']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu8']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('h')
     if menu.get('menu9'):
         if menu['menu9']['songTotal'] > 0:
-            print('( i )', menu['menu9']['songGroup'], '(' + str(menu['menu9']['songTotal']) + ' songs)')
-            menu_opts.append('i')
+            availSongs = [x for x in songs if x[1] == 9 and x[4] == False]
+            print('( i )', menu['menu9']['songGroup'], '(' + str(len(availSongs)) + '/' + str(menu['menu9']['songTotal']) + ' songs)')
+            if len(availSongs) > 0:
+                menu_opts.append('i')
     menu_opts.append('r')
     menu_opts.append('o')
     menu_opts.append('t')
+    menu_opts.append('u')
     menu_opts.append('?')
     menu_opts.append('q')
     menu_opts.append('x')
@@ -459,6 +510,7 @@ def loadgame():
         print('* error: No songs loaded in game...')
         print('* error: Check for correct directory paths...')
         sys.exit(0)
+    songsPlayed()
 
 def main():
     """
@@ -471,6 +523,7 @@ def main():
     gameOn = True
     status = True
     while gameOn:
+        pickedSong = []
         while status:
             loadmenu()
             print('Pick an option: ')
@@ -487,66 +540,86 @@ def main():
                     continue
                 elif 'a' in response:
                     picked = 1
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'b' in response:
                     picked = 2
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'c' in response:
                     picked = 3
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'd' in response:
                     picked = 4
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'e' in response:
                     picked = 5
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'f' in response:
                     picked = 6
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'g' in response:
                     picked = 7
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'h' in response:
                     picked = 8
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'i' in response:
                     picked = 9
-                    randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                    while not pickedSong:
+                        randSong = random.randint(1,menu['menu'+ str(picked)]['songTotal'])
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'r' in response:
-                    randPick = random.randint(1,len(songs))
-                    picked = songs[randPick][0]
-                    randSong = songs[randPick][1]
+                    while not pickedSong:
+                        randAllSongs = random.randint(1,len(songs)-1)
+                        picked = songs[randAllSongs][1]
+                        randSong = songs[randAllSongs][2]
+                        pickedSong = [x for x in songs if x[1] == picked and x[2] == randSong and x[4] == False]
                     status = False
                 elif 'o' in response:
                     override()
                     status = False
+                elif 'u' in response:
+                    for z in played:
+                        print(z[3].split('/')[-1])
+                    input('...')
+                    continue
                 elif 't' in response:
                     teammenu()
                     continue
                 else:
                     continue
-    
-        #input(picked)
-        #input(randSong)
-        pickedSong = [x for x in songs if x[0] == picked and x[1] == randSong]
-        #input(pickedSong[0][2])
-        #input([x for x in songs if x[0] == picked])
-     
+
         print('-' * 20)
         print('Press spacebar to hear the song...')
-        os.system('mpv --ao=alsa --no-audio-display --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  pickedSong[0][2] + '"')
+        songSelected(picked,randSong)     
+        os.system('mpv --ao=alsa --no-audio-display --really-quiet --pause --start=0 --end=' + str(clipsec + 1) + ' "' +  pickedSong[0][3] + '"')
         # load answer
-        answerTitle = songinfo(pickedSong[0][2],'title:')
-        answerArtist = songinfo(pickedSong[0][2],'artist:')
+        answerTitle = songinfo(pickedSong[0][3],'title:')
+        answerArtist = songinfo(pickedSong[0][3],'artist:')
         status2 = True
         while status2:
             clearscreen()
@@ -586,13 +659,13 @@ def main():
                 print('=' * 60)
                 input('...press enter to continue')
             elif 'r' in response:
-                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  pickedSong[0][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + 1) + ' "' +  pickedSong[0][3] + '"')
             elif 'c' in response:
-                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + cheatsec + 1) + ' "' +  pickedSong[0][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 --end=' + str(clipsec + cheatsec + 1) + ' "' +  pickedSong[0][3] + '"')
             elif 'w' in response:
-                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' +  pickedSong[0][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display --really-quiet --start=0 ' + '"' +  pickedSong[0][3] + '"')
             elif 'p' in response:
-                os.system('mpv --ao=alsa --no-audio-display "' +  pickedSong[0][2] + '"')
+                os.system('mpv --ao=alsa --no-audio-display "' +  pickedSong[0][3] + '"')
             elif 'n' in response:
                 picked = 0
                 status = True
