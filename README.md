@@ -3,12 +3,12 @@
 
 This python3 script will create a menu from a local directory, using up to 9 different top level directories, to create a simple "Name That Tune" game. It allows you to hear the first 5 seconds of the song, then select options until the answer is requested. You can manually keep track of team names and scores (2 teams).
 
-It works really well with compilation albums (various artists). I use it with a Raspberry Pi connected to my TV. I use a 128 GB SD card, without GUI, and a display resolution of 640x480 60Hz 4:3 (CEA Mode 1).
+It works really well with compilation albums (various artists). I use it with a Raspberry Pi connected to my TV. I use a 128 GB SD card, without a GUI, and a display resolution of 640x480 60Hz.
 
 ### NEW!
 * An intro song can be added at the start banner, so that the volume can be adjusted before the game begins.
 * Will now track all played songs, in each menu category, so that it can not be played again.
-* If all songs in a menu category have been played, that menu can not be pick anymore.
+* If all songs in a menu category have been played, that menu can not be picked anymore.
 
 ### An ode to Arcade banner:
 ```
@@ -43,7 +43,7 @@ It works really well with compilation albums (various artists). I use it with a 
 ## Some of the options
 
 * Automatically creates a configuration file, if needed.
-* Reads a music directory using the first 9 music folders listed.
+* Reads a music directory using the first 9 music sub-folders listed.
 * Scans each folder, and the first level directory becomes a separate menu option.
 * It is set at a 5 second audio clip, from the beginning of the song.
 * It also allows for 10 extra seconds to be added. (cheat)
@@ -65,12 +65,85 @@ MPV has a neat feature that allows you to hear a song, without showing anything 
 
  -  [mpv](https://mpv.io) to play the songs, hide the artist/title, and read mp3 tags.
 
-### Configuration
+### Quick Configuration (on desktop or existing setup)
 
 * Place ntt.py in a folder.
 * Create music directory with several sub-directories of music files.
-* The first 9 directories will be used, and become the menu selections.
+* The first 9 sub-directories (in top music folder) will be used, and become the menu selections.
 * First time run: allow ntt.py to create configuration file.
+* Edit ntt.ini for music directory and intro song location.
+
+### Example Setup on Raspberry Pi 3B+ (new Lite install)
+
+* Download Lite 64-bit version for 3B+
+* Uncompress xz image
+* Flash to SD card with balenaEtcher
+* Place SD card in RPi and turn on
+
+#### at First Boot
+  * Pick Keyboard: other/English(US)
+  * Enter New Username (ntt)
+  * Enter Password
+  * Confirm Password
+  * reboot and login as ntt
+
+#### sudo raspi-config
+  * Select 1 System Options, S1 Wireless Lan, enter country, ssid, pw
+  * reboot and login as ntt
+
+#### sudo raspi-config
+  * Select 1 System Options, S5 Boot/Auto Login, B2 Console Autologin
+  * Select 6 Advanced Options, A1 Expand Filesystem
+  * Exit/Reboot Now
+  * login as ntt
+  * sudo apt install mpv
+  * (coffee break)
+
+#### Note:
+  * RPi Lite does NOT come with any audio daemon!
+  * sudo apt install pulseaudio
+  * sudo raspi-config
+  * select 6 Advanced Settings / Audio config / select PulseAudio
+  * sudo reboot
+  * sudo raspi-config
+  * select System Settings / Audio / select HDMI
+  * reboot and login as ntt
+
+#### finish RPi setup
+  * sudo apt update
+  * sudo apt upgrade
+  * (more coffee)
+  * shutdown -h now
+  * remove SD card and mount on desktop
+
+#### (on desktop) within /home/ntt folder on SD card
+  * go to the "rootfs" partition of the SD card
+  * copy ntt.py to /home/ntt
+  * make directory "music" in /home/ntt (mkdir music)
+  * copy up to 9 music folders (and sub-folders) under new music directory
+  * copy intro song to /home/ntt (rename intro.mp3 or edit ntt.ini later)
+
+#### Note:
+  * I made my RPi screen very small by editing the boot options manually
+  * go to the "bootfs" partition of the SD card
+  * edit the cmdline.txt file
+  * add the following to the end of your boot string
+```
+ video=HDMI-A-1:640x480M@60
+```
+
+#### continue SD setup on desktop
+  * unmount the SD card and remove
+  * place in RPi and turn on
+
+#### back on RPi
+  * login as ntt
+  * make executable with "chmod +x ntt.py" (to start using ./ntt.py) or
+  * python3 ntt.py
+  * allow ntt.py to create configuration file
+  * python3 ntt.py
+
+## How to Play
 
 ### Start game
 ```
@@ -84,7 +157,7 @@ $ python3 ntt.py
 ```
 
 #### Song selection menu
-##### Directory structure:
+##### Example Directory structure:
 ```
 music
    Classical Music
@@ -106,7 +179,7 @@ music
       disc 2
 ```
 
-##### Game Menu:
+##### Example Game Menu:
 ```
 ============================================================
            Gals              vs               Guys
